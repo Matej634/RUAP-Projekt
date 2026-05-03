@@ -273,20 +273,7 @@ input.text-input:focus{outline:none;border-color:var(--accent);}
       </div>
       <div style="border:1px solid var(--accent);border-radius:99px;padding:4px 10px;font-size:11px;color:var(--accent);font-weight:700;margin-top:6px;text-align:center;">Sezona 2026.<br>Đukin stan</div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
-      <div class="card text-center" style="padding:14px 8px;">
-        <div id="home-matches" style="font-size:28px;font-weight:900;">0</div>
-        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">termina</div>
-      </div>
-      <div class="card text-center" style="padding:14px 8px;border-color:color-mix(in srgb,var(--accent) 40%,var(--border));">
-        <div id="home-goals" style="font-size:28px;font-weight:900;">0</div>
-        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">golova</div>
-      </div>
-      <div class="card text-center" style="padding:14px 8px;">
-        <div id="home-players" style="font-size:28px;font-weight:900;">0</div>
-        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">igrača</div>
-      </div>
-    </div>
+    <div id="home-winratio" class="mb12"></div>
     <div id="home-topscorer"></div>
     <button class="btn btn-accent mb24" onclick="navigate('attendance')" style="gap:10px;font-size:18px;letter-spacing:2px;margin-bottom:20px;">➕ NOVI TERMIN</button>
     <div class="section-label">Zadnji termin</div>
@@ -534,13 +521,46 @@ const renders = {
 function renderHome(){
   const players=DB.getPlayers();
   const matches=DB.getMatches().filter(m=>m.completed);
-  el('home-players').textContent=players.length;
-  el('home-matches').textContent=matches.length;
-  const totalGoals=matches.reduce((s,m)=>s+Object.values(m.goals||{}).reduce((a,b)=>a+b,0),0);
-  el('home-goals').textContent=totalGoals;
+  const total=matches.length;
 
   const now=new Date();
   el('home-date').textContent=`${DAYS[now.getDay()]}, ${now.getDate()}. ${MONTHS_FULL[now.getMonth()]} ${now.getFullYear()}.`;
+
+  // win ratio card
+  const wWins=matches.filter(m=>m.score.white>m.score.blue).length;
+  const bWins=matches.filter(m=>m.score.blue>m.score.white).length;
+  const draws=matches.filter(m=>m.score.white===m.score.blue).length;
+  const wBar=total?wWins/total*100:0;
+  const bBar=total?bWins/total*100:0;
+  const dBar=total?draws/total*100:0;
+  const wPct=total?Math.round(wWins/total*100):0;
+  const bPct=total?Math.round(bWins/total*100):0;
+  el('home-winratio').innerHTML=total?`
+    <div class="card mb12" style="padding:16px;">
+      <div class="section-label" style="margin-bottom:12px;">Omjer pobjeda · ${total} utakmica</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="text-align:center;min-width:56px;">
+          <div style="font-size:36px;font-weight:900;color:var(--wt);line-height:1;">${wWins}</div>
+          <div style="font-size:10px;color:var(--wt);font-weight:800;letter-spacing:1.5px;margin-top:3px;">BIJELI</div>
+        </div>
+        <div style="text-align:center;flex:1;">
+          ${draws>0?`<div style="font-size:13px;font-weight:700;color:var(--warning);">${draws} remi</div>`:'<div style="font-size:12px;color:var(--muted);">nema remija</div>'}
+        </div>
+        <div style="text-align:center;min-width:56px;">
+          <div style="font-size:36px;font-weight:900;color:var(--bt-light);line-height:1;">${bWins}</div>
+          <div style="font-size:10px;color:var(--bt-light);font-weight:800;letter-spacing:1.5px;margin-top:3px;">PLAVI</div>
+        </div>
+      </div>
+      <div style="height:12px;border-radius:99px;overflow:hidden;display:flex;background:var(--bg2);gap:2px;">
+        <div style="width:${wBar}%;background:var(--wt);border-radius:99px 0 0 99px;transition:width .4s;"></div>
+        ${draws>0?`<div style="width:${dBar}%;background:var(--warning);"></div>`:''}
+        <div style="width:${bBar}%;background:var(--bt);border-radius:0 99px 99px 0;transition:width .4s;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;">
+        <div style="font-size:12px;color:var(--muted);font-weight:600;">${wPct}%</div>
+        <div style="font-size:12px;color:var(--muted);font-weight:600;">${bPct}%</div>
+      </div>
+    </div>`:`<div class="card mb12" style="padding:14px 16px;border-style:dashed;text-align:center;"><div style="font-size:12px;color:var(--muted);">Odigraj prvi termin za prikaz omjera pobjeda</div></div>`;
 
   // top scorer
   const totals={};
@@ -1055,9 +1075,9 @@ function renderHistory(){
         <div class="history-result"><div class="result-dot" style="background:${rc};"></div><div class="result-label" style="color:${rc};">${rl}</div></div>
         <div class="history-chevron">${expanded?'▲':'▼'}</div>
       </div>
-      ${expanded?`<div class="expand-content" style="display:flex;flex-direction:column;gap:8px;">
+      ${expanded?`<div class="expand-content">
         ${wSc.length||bSc.length?`
-          <div style="background:var(--bg2);border-radius:var(--r-md);padding:12px;">
+          <div style="padding:10px 0 12px;">
             <div class="expand-label" style="margin-bottom:8px;">⚽ Strijelci</div>
             <div style="display:flex;gap:10px;">
               <div style="flex:1;">
@@ -1070,21 +1090,23 @@ function renderHistory(){
                 ${bSc.map(id=>`<div style="font-size:14px;font-weight:600;color:var(--bt-light);padding:2px 0;">${playerName(id)}${m.goals[id]>1?` <span style="color:var(--accent-light);font-size:12px;font-weight:800;">${m.goals[id]}x</span>`:''}</div>`).join('')||`<div style="font-size:12px;color:var(--muted);">–</div>`}
               </div>
             </div>
-          </div>`:''}
+          </div>
+          <div style="height:1px;background:var(--border);"></div>`:''}
         ${m.mvp?.white||m.mvp?.blue?`
-          <div style="background:var(--gold-bg);border:1px solid color-mix(in srgb,var(--gold) 30%,transparent);border-radius:var(--r-md);padding:12px;">
+          <div style="padding:12px 0;">
             <div class="expand-label" style="margin-bottom:8px;">🏆 Najbolji igrač</div>
-            <div style="display:flex;gap:10px;">
-              ${m.mvp.white?`<div style="flex:1;background:#ffffff08;border-radius:var(--r-sm);padding:8px;text-align:center;"><div style="font-size:10px;font-weight:800;color:var(--wt);letter-spacing:1px;margin-bottom:3px;">BIJELI</div><div style="font-size:15px;font-weight:800;color:var(--gold);">${playerName(m.mvp.white)}</div></div>`:''}
-              ${m.mvp.white&&m.mvp.blue?`<div style="width:1px;background:color-mix(in srgb,var(--gold) 20%,transparent);"></div>`:''}
-              ${m.mvp.blue?`<div style="flex:1;background:#ffffff08;border-radius:var(--r-sm);padding:8px;text-align:center;"><div style="font-size:10px;font-weight:800;color:var(--bt-light);letter-spacing:1px;margin-bottom:3px;">PLAVI</div><div style="font-size:15px;font-weight:800;color:var(--gold);">${playerName(m.mvp.blue)}</div></div>`:''}
+            <div style="display:flex;gap:16px;">
+              ${m.mvp.white?`<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:11px;color:var(--wt);font-weight:700;">⬜ Bijeli:</span><span style="font-size:14px;font-weight:800;color:var(--gold);">${playerName(m.mvp.white)}</span></div>`:''}
+              ${m.mvp.blue?`<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:11px;color:var(--bt-light);font-weight:700;">🟦 Plavi:</span><span style="font-size:14px;font-weight:800;color:var(--gold);">${playerName(m.mvp.blue)}</span></div>`:''}
             </div>
-          </div>`:''}
-        <div style="background:var(--bg2);border-radius:var(--r-md);padding:12px;">
+          </div>
+          <div style="height:1px;background:var(--border);"></div>`:''}
+        <div style="padding:12px 0 10px;">
           <div class="expand-label" style="margin-bottom:6px;">👥 Prisutni (${(m.attendees||[]).length})</div>
           <div style="font-size:13px;color:var(--dim);line-height:1.8;">${(m.attendees||[]).map(id=>playerName(id)).join(', ')}</div>
         </div>
-        <button onclick="event.stopPropagation();delMatch('${m.id}')" style="color:var(--danger);font-size:13px;background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 0;text-align:left;">🗑 Obriši utakmicu</button>
+        <div style="height:1px;background:var(--border);"></div>
+        <button onclick="event.stopPropagation();delMatch('${m.id}')" style="color:var(--danger);font-size:13px;background:none;border:none;cursor:pointer;font-family:inherit;padding:10px 0 4px;text-align:left;">🗑 Obriši utakmicu</button>
       </div>`:''}
     </div>`;
   }).join('');
