@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#080D18">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Termin ⚽</title>
+<style>
+:root {
+  --bg:#080D18; --bg2:#0C1220; --card:#111826; --border:#1C2940;
+  --text:#E2E8F0; --muted:#64748B; --dim:#94A3B8;
+  --accent:#10B981; --accent-dark:#059669; --accent-light:#34D399;
+  --danger:#EF4444; --warning:#F59E0B;
+  --wt:#F1F5F9; --wt-bg:#1E293B; --wt-border:#475569;
+  --bt:#3B82F6; --bt-bg:#1E3A8A; --bt-border:#2563EB; --bt-light:#93C5FD;
+  --gold:#F59E0B; --gold-bg:#2D1F00;
+  --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:24px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:#061208;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:480px;margin:0 auto;min-height:100dvh;overflow-x:hidden;}
+.screen{display:none;min-height:100dvh;padding-bottom:68px;}
+.screen.active{display:block;}
+.screen.flow{padding-bottom:0;display:flex;flex-direction:column;}
+#field-bg{position:fixed;top:0;left:50%;transform:translateX(-50%);width:480px;height:100%;z-index:-1;pointer-events:none;}
+button{cursor:pointer;border:none;background:none;color:inherit;font-family:inherit;}
+
+/* BOTTOM NAV */
+#bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--card);border-top:1px solid var(--border);display:flex;z-index:100;height:60px;}
+#bottom-nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.5px;transition:color .15s;}
+#bottom-nav button.active{color:var(--accent);}
+#bottom-nav button span.ico{font-size:20px;}
+
+/* HEADER */
+.hdr{display:flex;align-items:center;padding:16px;border-bottom:1px solid var(--border);gap:12px;background:var(--bg);}
+.hdr-back{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--card);}
+.hdr h1{flex:1;font-size:18px;font-weight:800;}
+.hdr-sub{font-size:12px;color:var(--muted);}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;}
+.section-label{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;}
+
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;border-radius:var(--r-xl);font-weight:800;cursor:pointer;transition:opacity .15s;border:none;font-family:inherit;}
+.btn:active{opacity:.75;}
+.btn-accent{background:var(--accent);color:#fff;padding:18px 24px;font-size:16px;width:100%;box-shadow:0 4px 20px #10B98144;}
+.btn-danger{background:var(--danger);color:#fff;padding:16px 24px;font-size:16px;width:100%;box-shadow:0 4px 16px #EF444440;}
+.btn-outline{background:none;color:var(--dim);padding:14px 20px;font-size:14px;border:1px solid var(--border);border-radius:var(--r-lg);}
+.btn-sm{padding:10px 16px;font-size:13px;border-radius:var(--r-md);}
+
+/* GRID */
+.player-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px;}
+.player-attendance-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:all .15s;position:relative;min-height:90px;justify-content:center;}
+.player-attendance-card.present{background:#059669,22;border-color:var(--accent);background:color-mix(in srgb,var(--accent) 15%,var(--card));}
+.player-attendance-card .team-dot{width:10px;height:10px;border-radius:50%;}
+.player-attendance-card .pname{font-size:16px;font-weight:700;text-align:center;color:var(--dim);}
+.player-attendance-card.present .pname{color:#fff;}
+.player-attendance-card .check{position:absolute;top:8px;right:8px;background:var(--accent);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;}
+
+/* MATCH CARDS */
+.goal-card{background:var(--wt-bg);border:1.5px solid var(--wt-border);border-radius:var(--r-lg);padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:transform .1s;user-select:none;min-height:110px;justify-content:center;}
+.goal-card.blue{background:var(--bt-bg);border-color:var(--bt-border);}
+.goal-card:active{transform:scale(.92);}
+.goal-card .gname{font-size:15px;font-weight:800;text-align:center;color:var(--wt);}
+.goal-card.blue .gname{color:var(--bt-light);}
+.goal-card .gcnt{font-size:38px;font-weight:900;color:#fff;line-height:1;}
+.goal-card .gballs{font-size:14px;}
+.goal-card .gtap{font-size:10px;color:var(--muted);}
+
+/* SCORE BOARD */
+.scoreboard{background:var(--card);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;}
+.score-team{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.score-team-label{font-size:11px;font-weight:900;letter-spacing:2px;}
+.score-controls{display:flex;align-items:center;gap:10px;}
+.score-btn{width:34px;height:34px;border-radius:50%;font-size:20px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;line-height:1;}
+.score-btn.wt{background:var(--wt-bg);}
+.score-btn.bt{background:var(--bt-bg);}
+.score-val{font-size:44px;font-weight:900;color:#fff;min-width:48px;text-align:center;}
+.score-sep{display:flex;flex-direction:column;align-items:center;}
+.score-dash{font-size:28px;color:var(--muted);font-weight:300;}
+.live-dot{font-size:9px;color:var(--danger);font-weight:700;letter-spacing:1.5px;}
+
+/* TEAM SETUP */
+.teams-wrap{display:flex;gap:1px;flex:1;overflow:hidden;}
+.team-col{flex:1;padding:12px;overflow-y:auto;}
+.team-col-header{border-radius:var(--r-md);padding:8px 10px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.team-col-header.wt{background:var(--wt-bg);}
+.team-col-header.bt{background:var(--bt-bg);}
+.team-col-header h3{font-size:13px;font-weight:800;}
+.team-col-header .cnt{background:#ffffff22;border-radius:99px;padding:2px 8px;font-size:12px;font-weight:900;}
+.team-player-row{border-radius:var(--r-sm);padding:12px 10px;margin-bottom:6px;display:flex;align-items:center;gap:6px;cursor:pointer;font-size:15px;font-weight:700;transition:opacity .15s;border:1px solid transparent;}
+.team-player-row:active{opacity:.7;}
+.team-player-row.wt{background:color-mix(in srgb,var(--wt-bg) 80%,transparent);border-color:var(--wt-border);color:var(--wt);}
+.team-player-row.bt{background:color-mix(in srgb,var(--bt-bg) 80%,transparent);border-color:var(--bt-border);color:var(--bt-light);}
+.col-divider{width:1px;background:var(--border);}
+
+/* SUMMARY */
+.summary-score{font-size:64px;font-weight:900;line-height:1;}
+.winner-score{color:#fff;}
+.loser-score{color:var(--muted);}
+
+/* HISTORY */
+.history-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px;margin-bottom:8px;cursor:pointer;}
+.history-card.expanded{border-color:color-mix(in srgb,var(--accent) 50%,transparent);}
+.history-row{display:flex;align-items:center;gap:10px;}
+.history-date{flex:1.2;}
+.history-date .day{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.history-date .full{font-size:13px;color:var(--dim);font-weight:600;margin-top:2px;}
+.history-score-block{flex:1;text-align:center;font-size:18px;font-weight:900;}
+.history-result{flex:1.2;display:flex;align-items:center;gap:6px;}
+.result-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.result-label{font-size:11px;font-weight:700;}
+.history-chevron{color:var(--muted);font-size:16px;}
+.expand-content{border-top:1px solid var(--border);margin-top:10px;padding-top:10px;}
+.expand-row{margin-bottom:8px;}
+.expand-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+
+/* STATS */
+.tab-bar{display:flex;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);}
+.tab-btn{flex:1;padding:8px;border-radius:var(--r-sm);font-size:13px;font-weight:700;color:var(--muted);background:var(--card);cursor:pointer;text-align:center;border:none;font-family:inherit;}
+.tab-btn.active{background:var(--accent);color:#fff;}
+.stat-row{display:flex;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 14px;margin-bottom:6px;gap:10px;}
+.stat-row.top{border-color:color-mix(in srgb,var(--gold) 50%,transparent);background:var(--gold-bg);}
+.stat-chip{background:var(--bg2);border-radius:var(--r-sm);padding:4px 8px;text-align:center;min-width:38px;}
+.stat-chip .val{font-size:14px;font-weight:900;color:var(--dim);}
+.stat-chip.hl .val{color:var(--accent);}
+.stat-chip.gold .val{color:var(--gold);}
+.stat-chip .lbl{font-size:9px;color:var(--muted);text-transform:uppercase;}
+.record-card{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:14px;margin-bottom:8px;}
+.record-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.record-title{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:3px;}
+.record-val{font-size:14px;font-weight:700;}
+.streak-row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 14px;margin-bottom:6px;}
+.streak-row.active{border-color:color-mix(in srgb,var(--accent) 40%,transparent);}
+
+/* PLAYERS */
+.player-list-row{display:flex;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:14px 16px;margin-bottom:8px;gap:10px;}
+.team-tag{width:28px;height:28px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;border:1px solid;}
+.team-tag.wt{background:var(--wt-bg);border-color:var(--wt-border);color:var(--wt);}
+.team-tag.bt{background:var(--bt-bg);border-color:var(--bt-border);color:var(--bt-light);}
+.fab{position:fixed;bottom:76px;right:calc(50% - 228px);width:52px;height:52px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;cursor:pointer;box-shadow:0 4px 16px #10B98155;z-index:50;border:none;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:#000a;display:flex;align-items:flex-end;z-index:200;display:none;}
+.modal-overlay.open{display:flex;}
+.modal-card{background:var(--card);border-radius:var(--r-xl) var(--r-xl) 0 0;border-top:1px solid var(--border);padding:24px;width:100%;max-width:480px;margin:0 auto;}
+.modal-card h2{font-size:20px;font-weight:900;text-align:center;margin-bottom:20px;}
+.input-label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+input.text-input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r-md);color:#fff;font-size:18px;font-weight:700;padding:14px 16px;margin-bottom:16px;font-family:inherit;}
+input.text-input:focus{outline:none;border-color:var(--accent);}
+.team-toggle{display:flex;gap:8px;margin-bottom:20px;}
+.team-toggle-btn{flex:1;padding:14px;border-radius:var(--r-md);border:2px solid var(--border);background:var(--bg2);font-size:15px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;transition:all .15s;}
+.team-toggle-btn.wt.active{background:var(--wt-bg);border-color:var(--wt-border);color:var(--wt);}
+.team-toggle-btn.bt.active{background:var(--bt-bg);border-color:var(--bt-border);color:var(--bt-light);}
+.modal-actions{display:flex;gap:8px;}
+
+/* MVP */
+.mvp-player-row{display:flex;align-items:center;border-radius:var(--r-md);padding:14px 16px;margin-bottom:8px;cursor:pointer;border:1.5px solid;transition:all .15s;}
+.mvp-player-row.wt{background:var(--wt-bg);border-color:var(--wt-border);}
+.mvp-player-row.wt.sel{background:var(--gold-bg);border-color:var(--gold);}
+.mvp-player-row.bt{background:var(--bt-bg);border-color:var(--bt-border);}
+.mvp-player-row.bt.sel{background:var(--gold-bg);border-color:var(--gold);}
+.mvp-player-row span{flex:1;font-size:16px;font-weight:700;}
+.mvp-player-row.wt span{color:var(--wt);}
+.mvp-player-row.bt span{color:var(--bt-light);}
+.mvp-player-row.sel span{color:var(--gold);}
+.check-circle{width:28px;height:28px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;}
+
+/* CONFETTI */
+#confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:999;display:none;}
+.goal-flash{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;z-index:998;opacity:0;transition:opacity .1s;}
+.goal-flash.show{opacity:1;}
+.goal-flash .ball{font-size:64px;animation:pop .3s ease-out;}
+.goal-flash .txt{font-size:44px;font-weight:900;color:#fff;letter-spacing:4px;text-shadow:0 2px 12px #000;}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+
+/* UTILS */
+.p16{padding:16px;}
+.mb8{margin-bottom:8px;}
+.mb16{margin-bottom:16px;}
+.mb24{margin-bottom:24px;}
+.gap8{gap:8px;}
+.flex{display:flex;}
+.flex-col{flex-direction:column;}
+.center{align-items:center;justify-content:center;}
+.between{justify-content:space-between;}
+.text-center{text-align:center;}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:12px;}
+.empty-state .ico{font-size:60px;}
+.empty-state h3{font-size:18px;font-weight:800;}
+.empty-state p{font-size:14px;color:var(--muted);text-align:center;}
+.hint-bar{text-align:center;color:var(--muted);font-size:11px;padding:6px;background:var(--bg2);}
+.scrollable{overflow-y:auto;flex:1;}
+</style>
+</head>
+<body>
+
+<!-- FOOTBALL FIELD BACKGROUND -->
+<svg id="field-bg" viewBox="0 0 480 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+  <rect width="480" height="900" fill="#061208"/>
+  <!-- Grass stripes -->
+  <rect y="0"   width="480" height="75" fill="#081B09" opacity="0.6"/>
+  <rect y="150" width="480" height="75" fill="#081B09" opacity="0.6"/>
+  <rect y="300" width="480" height="75" fill="#081B09" opacity="0.6"/>
+  <rect y="450" width="480" height="75" fill="#081B09" opacity="0.6"/>
+  <rect y="600" width="480" height="75" fill="#081B09" opacity="0.6"/>
+  <rect y="750" width="480" height="75" fill="#081B09" opacity="0.6"/>
+  <!-- All lines at opacity 0.07 -->
+  <g stroke="white" stroke-width="2" fill="none" opacity="0.07">
+    <!-- Outer boundary -->
+    <rect x="36" y="36" width="408" height="828"/>
+    <!-- Halfway line -->
+    <line x1="36" y1="450" x2="444" y2="450"/>
+    <!-- Centre circle -->
+    <circle cx="240" cy="450" r="64"/>
+    <!-- Centre spot -->
+    <circle cx="240" cy="450" r="3" fill="white" stroke="none"/>
+    <!-- TOP: penalty area (16.5m deep = 130px, 40.32m wide = 242px → x:119-361) -->
+    <rect x="119" y="36" width="242" height="130"/>
+    <!-- TOP: 6-yard box (5.5m deep = 43px, 18.32m wide = 110px → x:185-295) -->
+    <rect x="185" y="36" width="110" height="43"/>
+    <!-- TOP: penalty spot (11m = 87px from line) -->
+    <circle cx="240" cy="123" r="3" fill="white" stroke="none"/>
+    <!-- TOP: penalty arc (r=64, centre at penalty spot y=123, exits box at y=166) -->
+    <path d="M 193 166 A 64 64 0 0 1 287 166"/>
+    <!-- BOTTOM: penalty area -->
+    <rect x="119" y="734" width="242" height="130"/>
+    <!-- BOTTOM: 6-yard box -->
+    <rect x="185" y="821" width="110" height="43"/>
+    <!-- BOTTOM: penalty spot -->
+    <circle cx="240" cy="777" r="3" fill="white" stroke="none"/>
+    <!-- BOTTOM: penalty arc -->
+    <path d="M 193 734 A 64 64 0 0 0 287 734"/>
+    <!-- Corner arcs (r=18) -->
+    <path d="M 36 54 A 18 18 0 0 1 54 36"/>
+    <path d="M 426 36 A 18 18 0 0 1 444 54"/>
+    <path d="M 54 864 A 18 18 0 0 0 36 846"/>
+    <path d="M 444 846 A 18 18 0 0 0 426 864"/>
+  </g>
+</svg>
+
+<!-- CONFETTI -->
+<canvas id="confetti-canvas"></canvas>
+<div class="goal-flash" id="goal-flash">
+  <div class="ball">⚽</div>
+  <div class="txt">GOOOL!</div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav id="bottom-nav">
+  <button onclick="navTo('home')" id="nav-home" class="active">
+    <span class="ico">⚽</span><span>Termin</span>
+  </button>
+  <button onclick="navTo('history')" id="nav-history">
+    <span class="ico">📋</span><span>Povijest</span>
+  </button>
+  <button onclick="navTo('stats')" id="nav-stats">
+    <span class="ico">🏆</span><span>Statistika</span>
+  </button>
+  <button onclick="navTo('players')" id="nav-players">
+    <span class="ico">👥</span><span>Igrači</span>
+  </button>
+</nav>
+
+<!-- ===== HOME ===== -->
+<div id="screen-home" class="screen active">
+  <div style="padding:16px 16px 0;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;margin-top:8px;">
+      <div>
+        <div style="font-size:24px;font-weight:900;letter-spacing:2px;">⚽ TERMIN <span style="color:var(--accent-light);font-size:18px;letter-spacing:1px;">Fudbaleri</span></div>
+        <div id="home-date" style="font-size:13px;color:var(--muted);margin-top:2px;"></div>
+      </div>
+      <div style="border:1px solid var(--accent);border-radius:99px;padding:4px 10px;font-size:11px;color:var(--accent);font-weight:700;margin-top:6px;text-align:center;">Sezona 2026.<br>Đukin stan</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+      <div class="card text-center" style="padding:14px 8px;">
+        <div id="home-matches" style="font-size:28px;font-weight:900;">0</div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">termina</div>
+      </div>
+      <div class="card text-center" style="padding:14px 8px;border-color:color-mix(in srgb,var(--accent) 40%,var(--border));">
+        <div id="home-goals" style="font-size:28px;font-weight:900;">0</div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">golova</div>
+      </div>
+      <div class="card text-center" style="padding:14px 8px;">
+        <div id="home-players" style="font-size:28px;font-weight:900;">0</div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">igrača</div>
+      </div>
+    </div>
+    <div id="home-topscorer"></div>
+    <button class="btn btn-accent mb24" onclick="navigate('attendance')" style="gap:10px;font-size:18px;letter-spacing:2px;margin-bottom:20px;">➕ NOVI TERMIN</button>
+    <div class="section-label">Zadnji termin</div>
+    <div id="home-last-match"></div>
+  </div>
+</div>
+
+<!-- ===== HISTORY ===== -->
+<div id="screen-history" class="screen">
+  <div class="hdr"><h1>Povijest termina</h1><span id="history-count" style="color:var(--muted);font-size:13px;"></span></div>
+  <div id="history-list" style="padding:12px 16px;"></div>
+</div>
+
+<!-- ===== STATS ===== -->
+<div id="screen-stats" class="screen">
+  <div class="hdr"><h1>Statistika</h1><span id="stats-count" style="color:var(--muted);font-size:13px;"></span></div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="statsTab(0,this)">Igrači</button>
+    <button class="tab-btn" onclick="statsTab(1,this)">Rekordi</button>
+    <button class="tab-btn" onclick="statsTab(2,this)">Serije</button>
+  </div>
+  <div id="stats-content" style="padding:12px 16px;"></div>
+</div>
+
+<!-- ===== PLAYERS ===== -->
+<div id="screen-players" class="screen">
+  <div class="hdr"><h1>Roster</h1><span id="players-count" style="color:var(--muted);font-size:13px;"></span></div>
+  <div id="players-list" style="padding:12px 16px;"></div>
+  <button class="fab" onclick="openPlayerModal()">+</button>
+</div>
+
+<!-- ===== ATTENDANCE ===== -->
+<div id="screen-attendance" class="screen flow" style="display:flex;flex-direction:column;min-height:100dvh;">
+  <div class="hdr">
+    <button class="hdr-back" onclick="navigate('home')">←</button>
+    <div style="flex:1;">
+      <h1>Dolazak na termin</h1>
+      <div class="hdr-sub">Tko je danas došao?</div>
+    </div>
+    <div id="attendance-count-badge" style="width:40px;height:40px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;">0</div>
+  </div>
+  <div id="attendance-grid" class="player-grid" style="flex:1;align-content:start;"></div>
+  <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;background:var(--bg);">
+    <button class="btn btn-outline btn-sm" onclick="toggleAllAttendance()" id="select-all-btn">Odaberi sve</button>
+    <button class="btn btn-accent" style="flex:1;font-size:15px;padding:14px;" onclick="goToTeamSetup()" id="attendance-next-btn">Postavi ekipe →</button>
+  </div>
+</div>
+
+<!-- ===== TEAM SETUP ===== -->
+<div id="screen-teamsetup" class="screen flow" style="display:flex;flex-direction:column;min-height:100dvh;">
+  <div class="hdr">
+    <button class="hdr-back" onclick="navigate('attendance')">←</button>
+    <h1>Postavljanje ekipa</h1>
+    <div style="width:36px;"></div>
+  </div>
+  <div class="hint-bar">Dodirni igrača za premještanje u drugu ekipu</div>
+  <div class="teams-wrap" style="flex:1;">
+    <div class="team-col" id="white-col">
+      <div class="team-col-header wt">
+        <h3>⬜ BIJELI</h3><span class="cnt" id="white-cnt">0</span>
+      </div>
+      <div id="white-players"></div>
+    </div>
+    <div class="col-divider"></div>
+    <div class="team-col" id="blue-col">
+      <div class="team-col-header bt">
+        <h3>🟦 PLAVI</h3><span class="cnt" id="blue-cnt">0</span>
+      </div>
+      <div id="blue-players"></div>
+    </div>
+  </div>
+  <div style="padding:12px 16px;border-top:1px solid var(--border);background:var(--bg);">
+    <button class="btn btn-accent" style="font-size:16px;letter-spacing:2px;" onclick="startMatch()">⚽ POKRENI UTAKMICU</button>
+  </div>
+</div>
+
+<!-- ===== MATCH ===== -->
+<div id="screen-match" class="screen flow" style="display:flex;flex-direction:column;min-height:100dvh;">
+  <div class="scoreboard" id="scoreboard">
+    <div class="score-team">
+      <div class="score-team-label" style="color:var(--wt);">BIJELI</div>
+      <div class="score-controls">
+        <button class="score-btn wt" onclick="adjScore('white',-1)">−</button>
+        <div class="score-val" id="score-white">0</div>
+        <button class="score-btn wt" onclick="adjScore('white',1)">+</button>
+      </div>
+    </div>
+    <div class="score-sep">
+      <div class="score-dash">:</div>
+      <div class="live-dot">UŽIVO</div>
+    </div>
+    <div class="score-team">
+      <div class="score-team-label" style="color:var(--bt-light);">PLAVI</div>
+      <div class="score-controls">
+        <button class="score-btn bt" onclick="adjScore('blue',-1)">−</button>
+        <div class="score-val" id="score-blue">0</div>
+        <button class="score-btn bt" onclick="adjScore('blue',1)">+</button>
+      </div>
+    </div>
+  </div>
+  <div class="hint-bar">Dodir = gol &nbsp;·&nbsp; Dugi dodir = poništi gol</div>
+  <div id="match-players" style="flex:1;overflow-y:auto;padding:12px 12px;"></div>
+  <div style="padding:12px 16px;border-top:1px solid var(--border);background:var(--bg);">
+    <button class="btn btn-danger" style="gap:8px;letter-spacing:2px;" onclick="finishMatch()">🏁 ZAVRŠI UTAKMICU</button>
+  </div>
+</div>
+
+<!-- ===== MVP ===== -->
+<div id="screen-mvp" class="screen flow" style="display:flex;flex-direction:column;min-height:100dvh;">
+  <div class="hdr" style="flex-direction:column;align-items:center;gap:4px;padding:20px 16px;">
+    <h1 style="font-size:22px;">🏆 Odabir MVP-a</h1>
+    <div style="font-size:13px;color:var(--muted);">Svaka ekipa bira svog najboljeg igrača</div>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:0 16px 16px;">
+    <div id="mvp-score-reminder" class="card text-center mb16" style="padding:14px;"></div>
+    <div id="mvp-content"></div>
+  </div>
+  <div style="padding:12px 16px;border-top:1px solid var(--border);background:var(--bg);">
+    <button class="btn btn-accent" onclick="finishMVP()">Zaključi i prikaži sažetak →</button>
+  </div>
+</div>
+<!-- hidden canvas for share image -->
+<canvas id="share-canvas" style="display:none;"></canvas>
+
+<!-- ===== SUMMARY ===== -->
+<div id="screen-summary" class="screen flow">
+  <div style="padding:16px;max-width:480px;margin:0 auto;">
+    <div class="text-center" style="padding:16px 0 8px;">
+      <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:2px;">Sažetak utakmice</div>
+      <div id="summary-date" style="font-size:14px;color:var(--dim);margin-top:4px;"></div>
+    </div>
+    <div id="summary-score-card" class="card text-center mb16" style="padding:28px 20px;"></div>
+    <div id="summary-scorers" class="mb16"></div>
+    <div id="summary-mvp" class="mb16"></div>
+    <div id="summary-attendees" class="card mb16" style="padding:14px;"></div>
+    <button class="btn mb16" onclick="shareResult()" style="background:#1DA1F2;color:#fff;width:100%;padding:16px;font-size:16px;font-weight:800;border-radius:var(--r-xl);gap:8px;">📤 Podijeli u grupu</button>
+    <button class="btn btn-outline" style="width:100%;padding:16px;" onclick="navTo('home')">Završi</button>
+  </div>
+</div>
+
+<!-- PLAYER MODAL -->
+<div class="modal-overlay" id="player-modal">
+  <div class="modal-card">
+    <h2 id="modal-title">Dodaj igrača</h2>
+    <div class="input-label">Ime igrača</div>
+    <input class="text-input" id="player-name-input" placeholder="npr. Marko" maxlength="20">
+    <div class="input-label">Zadana ekipa</div>
+    <div class="team-toggle">
+      <button class="team-toggle-btn wt active" id="team-btn-white" onclick="selectTeam('white')">⬜ Bijeli</button>
+      <button class="team-toggle-btn bt" id="team-btn-blue" onclick="selectTeam('blue')">🟦 Plavi</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" style="flex:1;padding:16px;" onclick="closePlayerModal()">Odustani</button>
+      <button class="btn btn-accent" style="flex:2;padding:16px;" onclick="savePlayer()">Spremi</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ STORAGE ============
+const DB = {
+  getPlayers(){return JSON.parse(localStorage.getItem('termin_players')||'[]');},
+  savePlayers(p){localStorage.setItem('termin_players',JSON.stringify(p));},
+  getMatches(){return JSON.parse(localStorage.getItem('termin_matches')||'[]');},
+  saveMatch(m){
+    const ms=this.getMatches();
+    const i=ms.findIndex(x=>x.id===m.id);
+    if(i>=0)ms[i]=m;else ms.unshift(m);
+    localStorage.setItem('termin_matches',JSON.stringify(ms));
+  },
+  deleteMatch(id){
+    localStorage.setItem('termin_matches',JSON.stringify(this.getMatches().filter(m=>m.id!==id)));
+  },
+  genId(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
+};
+
+// ============ STATE ============
+let S = {
+  presentIds:[],
+  teams:{white:[],blue:[]},
+  match:null,
+  goals:{},
+  score:{white:0,blue:0},
+  mvp:{white:null,blue:null},
+  editingPlayerId:null,
+  selectedTeam:'white',
+  statsTab:0,
+  expandedMatch:null,
+};
+
+// ============ HELPERS ============
+const MONTHS=['sij','velj','ožu','tra','svi','lip','srp','kol','ruj','lis','stu','pro'];
+const DAYS=['ned','pon','uto','sri','čet','pet','sub'];
+const MONTHS_FULL=['siječnja','veljače','ožujka','travnja','svibnja','lipnja','srpnja','kolovoza','rujna','listopada','studenoga','prosinca'];
+
+function fmtDate(d){const x=new Date(d);return `${x.getDate()}. ${MONTHS[x.getMonth()]}. ${x.getFullYear()}.`;}
+function fmtDateFull(d){const x=new Date(d);return `${x.getDate()}. ${MONTHS_FULL[x.getMonth()]} ${x.getFullYear()}.`;}
+function fmtDay(d){return DAYS[new Date(d).getDay()];}
+function playerName(id){return DB.getPlayers().find(p=>p.id===id)?.name||'?';}
+function el(id){return document.getElementById(id);}
+
+// ============ NAVIGATION ============
+const MAIN_SCREENS=['home','history','stats','players'];
+
+function navTo(name){
+  MAIN_SCREENS.forEach(s=>{
+    el(`nav-${s}`)?.classList.toggle('active',s===name);
+  });
+  navigate(name);
+}
+
+function navigate(name){
+  document.querySelectorAll('.screen').forEach(s=>{
+    s.classList.remove('active');
+    s.style.display='none';
+  });
+  const target=el(`screen-${name}`);
+  if(target){
+    target.classList.add('active');
+    const flowScreens=['attendance','teamsetup','match','mvp'];
+    target.style.display=flowScreens.includes(name)?'flex':'block';
+  }
+  el('bottom-nav').style.display=MAIN_SCREENS.includes(name)?'flex':'none';
+  el('confetti-canvas').style.display='none';
+  el('goal-flash').classList.remove('show');
+  window.scrollTo(0,0);
+  renders[name]?.();
+}
+
+const renders = {
+  home: renderHome,
+  history: renderHistory,
+  stats: ()=>renderStats(S.statsTab),
+  players: renderPlayers,
+  attendance: renderAttendance,
+  teamsetup: renderTeamSetup,
+  match: renderMatch,
+  mvp: renderMVP,
+  summary: renderSummary,
+};
+
+// ============ HOME ============
+function renderHome(){
+  const players=DB.getPlayers();
+  const matches=DB.getMatches().filter(m=>m.completed);
+  el('home-players').textContent=players.length;
+  el('home-matches').textContent=matches.length;
+  const totalGoals=matches.reduce((s,m)=>s+Object.values(m.goals||{}).reduce((a,b)=>a+b,0),0);
+  el('home-goals').textContent=totalGoals;
+
+  const now=new Date();
+  el('home-date').textContent=`${DAYS[now.getDay()]}, ${now.getDate()}. ${MONTHS_FULL[now.getMonth()]} ${now.getFullYear()}.`;
+
+  // top scorer
+  const totals={};
+  matches.forEach(m=>Object.entries(m.goals||{}).forEach(([id,g])=>totals[id]=(totals[id]||0)+g));
+  let top=null,topG=0;
+  Object.entries(totals).forEach(([id,g])=>{if(g>topG){topG=g;top=id;}});
+  el('home-topscorer').innerHTML=top?`<div class="card mb16" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-color:color-mix(in srgb,var(--gold) 30%,var(--border));background:var(--gold-bg);">🏆 <span style="color:var(--dim);font-size:14px;">Kralj strijelaca: <strong style="color:var(--gold);">${playerName(top)}</strong> <span style="color:var(--muted);">(${topG} golova)</span></span></div>`:'';
+
+  // last match
+  const last=matches[0];
+  if(last){
+    const {white,blue}=last.score;
+    const won=white>blue?'Bijeli pobjedili':blue>white?'Plavi pobjedili':'Remi';
+    const wc=white>blue?'var(--wt)':blue>white?'var(--bt-light)':'var(--warning)';
+    el('home-last-match').innerHTML=`<div class="card text-center" style="padding:20px;">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">${fmtDateFull(last.date)}</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:10px;">
+        <div style="text-align:center;"><div style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:1px;">BIJELI</div><div style="font-size:56px;font-weight:900;">${white}</div></div>
+        <div style="font-size:28px;color:var(--muted);">-</div>
+        <div style="text-align:center;"><div style="font-size:56px;font-weight:900;">${blue}</div><div style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:1px;">PLAVI</div></div>
+      </div>
+      <div style="font-size:15px;font-weight:700;color:${wc};">${won}</div>
+    </div>`;
+  } else {
+    el('home-last-match').innerHTML=`<div class="card" style="border-style:dashed;padding:32px;text-align:center;">
+      <div style="font-size:48px;margin-bottom:12px;">🏟️</div>
+      <div style="font-size:16px;color:var(--dim);font-weight:600;margin-bottom:6px;">Još nema odigranih termina.</div>
+      <div style="font-size:13px;color:var(--muted);">Pritisni NOVI TERMIN i počni bilježiti!</div>
+    </div>`;
+  }
+}
+
+// ============ ATTENDANCE ============
+function renderAttendance(){
+  const players=DB.getPlayers();
+  S.presentIds=[];
+  updateAttendanceBadge();
+  if(!players.length){
+    el('attendance-grid').innerHTML=`<div style="grid-column:1/-1;" class="empty-state"><div class="ico">👥</div><h3>Nema igrača</h3><p>Dodaj igrače u kartici Igrači.</p></div>`;
+    return;
+  }
+  el('attendance-grid').innerHTML=players.map(p=>`
+    <div class="player-attendance-card" id="att-${p.id}" onclick="toggleAttendance('${p.id}')">
+      <div class="team-dot" style="background:${p.defaultTeam==='white'?'var(--wt)':'var(--bt)'}"></div>
+      <div class="pname">${p.name}</div>
+    </div>
+  `).join('');
+}
+
+function toggleAttendance(id){
+  const idx=S.presentIds.indexOf(id);
+  if(idx>=0)S.presentIds.splice(idx,1);else S.presentIds.push(id);
+  el(`att-${id}`)?.classList.toggle('present',S.presentIds.includes(id));
+  const card=el(`att-${id}`);
+  if(card){
+    const existing=card.querySelector('.check');
+    if(S.presentIds.includes(id)&&!existing){
+      const chk=document.createElement('div');
+      chk.className='check';chk.textContent='✓';card.appendChild(chk);
+    } else if(!S.presentIds.includes(id)&&existing){
+      existing.remove();
+    }
+  }
+  updateAttendanceBadge();
+}
+
+function updateAttendanceBadge(){
+  el('attendance-count-badge').textContent=S.presentIds.length;
+  el('attendance-next-btn').style.opacity=S.presentIds.length<2?0.5:1;
+}
+
+function toggleAllAttendance(){
+  const players=DB.getPlayers();
+  const allIn=players.every(p=>S.presentIds.includes(p.id));
+  S.presentIds=allIn?[]:players.map(p=>p.id);
+  players.forEach(p=>{
+    el(`att-${p.id}`)?.classList.toggle('present',S.presentIds.includes(p.id));
+    const card=el(`att-${p.id}`);
+    if(!card)return;
+    const existing=card.querySelector('.check');
+    if(S.presentIds.includes(p.id)&&!existing){
+      const chk=document.createElement('div');chk.className='check';chk.textContent='✓';card.appendChild(chk);
+    } else if(!S.presentIds.includes(p.id)&&existing){
+      existing.remove();
+    }
+  });
+  el('select-all-btn').textContent=S.presentIds.length?'Odznači sve':'Odaberi sve';
+  updateAttendanceBadge();
+}
+
+function goToTeamSetup(){
+  if(S.presentIds.length<2)return;
+  navigate('teamsetup');
+}
+
+// ============ TEAM SETUP ============
+function renderTeamSetup(){
+  const players=DB.getPlayers().filter(p=>S.presentIds.includes(p.id));
+  S.teams={white:[],blue:[]};
+  players.forEach(p=>{if(p.defaultTeam==='blue')S.teams.blue.push(p.id);else S.teams.white.push(p.id);});
+  redrawTeams(players);
+}
+
+function redrawTeams(players){
+  if(!players)players=DB.getPlayers().filter(p=>S.presentIds.includes(p.id));
+  const wPlayers=players.filter(p=>S.teams.white.includes(p.id));
+  const bPlayers=players.filter(p=>S.teams.blue.includes(p.id));
+  el('white-cnt').textContent=wPlayers.length;
+  el('blue-cnt').textContent=bPlayers.length;
+  el('white-players').innerHTML=wPlayers.map(p=>`
+    <div class="team-player-row wt" onclick="movePlayer('${p.id}','blue')">
+      <span style="flex:1;">${p.name}</span><span style="font-size:12px;">→</span>
+    </div>`).join('')||'<div style="padding:10px;text-align:center;font-size:12px;color:var(--muted);">Nema igrača</div>';
+  el('blue-players').innerHTML=bPlayers.map(p=>`
+    <div class="team-player-row bt" onclick="movePlayer('${p.id}','white')">
+      <span style="font-size:12px;">←</span><span style="flex:1;">${p.name}</span>
+    </div>`).join('')||'<div style="padding:10px;text-align:center;font-size:12px;color:var(--muted);">Nema igrača</div>';
+}
+
+function movePlayer(id,to){
+  S.teams.white=S.teams.white.filter(x=>x!==id);
+  S.teams.blue=S.teams.blue.filter(x=>x!==id);
+  S.teams[to].push(id);
+  redrawTeams();
+}
+
+function startMatch(){
+  S.match={id:DB.genId(),date:new Date().toISOString(),attendees:[...S.presentIds],teams:{...S.teams},score:{white:0,blue:0},goals:{},mvp:{white:null,blue:null},completed:false};
+  S.goals={};S.score={white:0,blue:0};S.mvp={white:null,blue:null};
+  navigate('match');
+}
+
+// ============ MATCH ============
+function renderMatch(){
+  el('score-white').textContent=S.score.white;
+  el('score-blue').textContent=S.score.blue;
+  const players=DB.getPlayers();
+  const wPlayers=players.filter(p=>S.teams.white.includes(p.id));
+  const bPlayers=players.filter(p=>S.teams.blue.includes(p.id));
+  el('match-players').innerHTML=`
+    <div class="section-label" style="color:var(--wt);">⬜ Bijeli</div>
+    <div class="player-grid" style="padding:0 0 16px;margin-bottom:4px;">${wPlayers.map(p=>goalCard(p,'white')).join('')}</div>
+    <div class="section-label" style="color:var(--bt-light);">🟦 Plavi</div>
+    <div class="player-grid" style="padding:0;">${bPlayers.map(p=>goalCard(p,'blue')).join('')}</div>
+  `;
+  attachGoalEvents();
+}
+
+function goalCard(p,team){
+  const g=S.goals[p.id]||0;
+  const isBlue=team==='blue';
+  return `<div class="goal-card${isBlue?' blue':''}" id="gc-${p.id}" data-player="${p.id}" data-team="${team}">
+    <div class="gname">${p.name}</div>
+    <div class="gcnt">${g}</div>
+    ${g>0?`<div class="gballs">${'⚽'.repeat(Math.min(g,5))}</div>`:`<div class="gtap">dodir = gol</div>`}
+  </div>`;
+}
+
+function attachGoalEvents(){
+  document.querySelectorAll('.goal-card').forEach(card=>{
+    let pressTimer=null;
+    card.addEventListener('touchstart',e=>{
+      pressTimer=setTimeout(()=>{undoGoal(card.dataset.player,card.dataset.team);pressTimer=null;},500);
+    });
+    card.addEventListener('touchend',e=>{
+      if(pressTimer){clearTimeout(pressTimer);addGoal(card.dataset.player,card.dataset.team);}
+    });
+    card.addEventListener('touchmove',()=>{if(pressTimer){clearTimeout(pressTimer);pressTimer=null;}});
+    // desktop click
+    card.addEventListener('click',e=>{addGoal(card.dataset.player,card.dataset.team);});
+  });
+}
+
+function addGoal(playerId,team){
+  S.goals[playerId]=(S.goals[playerId]||0)+1;
+  S.score[team]++;
+  updateGoalCard(playerId);
+  el(`score-${team}`).textContent=S.score[team];
+  spawnConfetti();
+  if(navigator.vibrate)navigator.vibrate([30,10,30]);
+}
+
+function undoGoal(playerId,team){
+  if(!S.goals[playerId])return;
+  S.goals[playerId]--;
+  S.score[team]=Math.max(0,S.score[team]-1);
+  updateGoalCard(playerId);
+  el(`score-${team}`).textContent=S.score[team];
+  if(navigator.vibrate)navigator.vibrate(60);
+}
+
+function updateGoalCard(playerId){
+  const card=el(`gc-${playerId}`);
+  if(!card)return;
+  const g=S.goals[playerId]||0;
+  card.querySelector('.gcnt').textContent=g;
+  const bottom=card.querySelector('.gballs')||card.querySelector('.gtap');
+  if(bottom){
+    if(g>0){bottom.className='gballs';bottom.textContent='⚽'.repeat(Math.min(g,5));}
+    else{bottom.className='gtap';bottom.textContent='dodir = gol';}
+  }
+}
+
+function adjScore(team,delta){
+  S.score[team]=Math.max(0,S.score[team]+delta);
+  el(`score-${team}`).textContent=S.score[team];
+}
+
+function finishMatch(){
+  if(!confirm(`Završi utakmicu?\n\nBijeli ${S.score.white} - ${S.score.blue} Plavi`))return;
+  S.match={...S.match,goals:{...S.goals},score:{...S.score}};
+  DB.saveMatch(S.match);
+  navigate('mvp');
+}
+
+// ============ MVP ============
+function renderMVP(){
+  const players=DB.getPlayers();
+  const wPlayers=players.filter(p=>S.teams.white.includes(p.id));
+  const bPlayers=players.filter(p=>S.teams.blue.includes(p.id));
+  S.mvp={white:null,blue:null};
+  el('mvp-score-reminder').innerHTML=`<span style="font-size:14px;font-weight:700;color:var(--muted);">BIJELI <span style="font-size:22px;font-weight:900;color:#fff;">${S.score.white}</span> - <span style="font-size:22px;font-weight:900;color:#fff;">${S.score.blue}</span> PLAVI</span>`;
+  el('mvp-content').innerHTML=`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <div style="width:12px;height:12px;border-radius:50%;background:var(--wt);"></div>
+      <div style="flex:1;">
+        <div style="font-size:15px;font-weight:800;">Najbolji igrač bijelog tima</div>
+        <div id="mvp-white-name" style="font-size:13px;color:var(--gold);font-weight:700;min-height:18px;"></div>
+      </div>
+    </div>
+    <div id="mvp-white-list" style="margin-bottom:20px;">${wPlayers.map(p=>mvpRow(p,'white')).join('')}</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <div style="width:12px;height:12px;border-radius:50%;background:var(--bt);"></div>
+      <div style="flex:1;">
+        <div style="font-size:15px;font-weight:800;">Najbolji igrač plavog tima</div>
+        <div id="mvp-blue-name" style="font-size:13px;color:var(--gold);font-weight:700;min-height:18px;"></div>
+      </div>
+    </div>
+    <div id="mvp-blue-list">${bPlayers.map(p=>mvpRow(p,'blue')).join('')}</div>
+  `;
+}
+
+function mvpRow(p,team){
+  return `<div class="mvp-player-row ${team}" id="mvp-row-${p.id}" onclick="selectMVP('${team}','${p.id}')">
+    <span>${p.name}</span>
+  </div>`;
+}
+
+function selectMVP(team,playerId){
+  const isSame=S.mvp[team]===playerId;
+  S.mvp[team]=isSame?null:playerId;
+  const players=DB.getPlayers().filter(p=>S.teams[team].includes(p.id));
+  players.forEach(p=>{
+    const row=el(`mvp-row-${p.id}`);
+    if(!row)return;
+    const isSel=S.mvp[team]===p.id;
+    row.classList.toggle('sel',isSel);
+    let chk=row.querySelector('.check-circle');
+    if(isSel&&!chk){
+      chk=document.createElement('div');chk.className='check-circle';chk.textContent='✓';row.appendChild(chk);
+      row.querySelector('span').textContent='🏆 '+p.name;
+    } else if(!isSel&&chk){
+      chk.remove();
+      row.querySelector('span').textContent=p.name;
+    }
+  });
+  const nameEl=el(`mvp-${team}-name`);
+  if(nameEl){
+    const sel=players.find(p=>p.id===S.mvp[team]);
+    nameEl.textContent=sel?'🏆 '+sel.name:'';
+  }
+}
+
+function finishMVP(){
+  S.match={...S.match,mvp:{...S.mvp},completed:true};
+  DB.saveMatch(S.match);
+  navigate('summary');
+}
+
+// ============ SUMMARY ============
+function renderSummary(){
+  const match=S.match;
+  const {score,goals,mvp,date,teams}=match;
+  const whiteWon=score.white>score.blue;
+  const blueWon=score.blue>score.white;
+  const result=whiteWon?'⬜ Bijeli pobjedili!':blueWon?'🟦 Plavi pobjedili!':'🤝 Remi!';
+  const rc=whiteWon?'var(--wt)':blueWon?'var(--bt-light)':'var(--warning)';
+
+  el('summary-date').textContent=fmtDateFull(date);
+  el('summary-score-card').innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:12px;">
+      <div style="text-align:center;"><div style="font-size:11px;font-weight:900;color:var(--wt);letter-spacing:2px;">BIJELI</div><div style="font-size:72px;font-weight:900;color:${whiteWon?'#fff':'var(--muted)'};">${score.white}</div></div>
+      <div style="font-size:32px;color:var(--muted);">–</div>
+      <div style="text-align:center;"><div style="font-size:72px;font-weight:900;color:${blueWon?'#fff':'var(--muted)'};">${score.blue}</div><div style="font-size:11px;font-weight:900;color:var(--bt-light);letter-spacing:2px;">PLAVI</div></div>
+    </div>
+    <div style="font-size:18px;font-weight:800;color:${rc};">${result}</div>
+  `;
+
+  const wScorers=(teams.white||[]).filter(id=>(goals[id]||0)>0);
+  const bScorers=(teams.blue||[]).filter(id=>(goals[id]||0)>0);
+  if(wScorers.length||bScorers.length){
+    el('summary-scorers').innerHTML=`<div class="card" style="padding:14px;">
+      <div class="section-label">⚽ Strijelci</div>
+      <div style="display:flex;gap:12px;">
+        <div style="flex:1;">${wScorers.length?`<div style="font-size:11px;font-weight:700;color:var(--wt);margin-bottom:6px;">Bijeli</div>${wScorers.map(id=>`<div style="font-size:15px;font-weight:700;color:var(--wt);margin-bottom:3px;">${playerName(id)}${goals[id]>1?` <span style="color:var(--accent);font-size:12px;">${goals[id]}x</span>`:''}</div>`).join('')}`:''}
+        </div>
+        <div style="width:1px;background:var(--border);"></div>
+        <div style="flex:1;">${bScorers.length?`<div style="font-size:11px;font-weight:700;color:var(--bt-light);margin-bottom:6px;">Plavi</div>${bScorers.map(id=>`<div style="font-size:15px;font-weight:700;color:var(--bt-light);margin-bottom:3px;">${playerName(id)}${goals[id]>1?` <span style="color:var(--accent);font-size:12px;">${goals[id]}x</span>`:''}</div>`).join('')}`:''}
+        </div>
+      </div>
+    </div>`;
+  } else el('summary-scorers').innerHTML='';
+
+  if(mvp.white||mvp.blue){
+    el('summary-mvp').innerHTML=`<div class="card" style="padding:14px;border-color:color-mix(in srgb,var(--gold) 40%,var(--border));background:var(--gold-bg);">
+      <div class="section-label">🏆 Najbolji igrač</div>
+      <div style="display:flex;gap:10px;">
+        ${mvp.white?`<div style="flex:1;background:var(--wt-bg);border:1px solid var(--wt-border);border-radius:var(--r-md);padding:10px;text-align:center;"><div style="font-size:11px;color:var(--wt);font-weight:700;margin-bottom:4px;">Bijeli</div><div style="font-size:16px;font-weight:900;color:var(--gold);">${playerName(mvp.white)}</div></div>`:''}
+        ${mvp.blue?`<div style="flex:1;background:var(--bt-bg);border:1px solid var(--bt-border);border-radius:var(--r-md);padding:10px;text-align:center;"><div style="font-size:11px;color:var(--bt-light);font-weight:700;margin-bottom:4px;">Plavi</div><div style="font-size:16px;font-weight:900;color:var(--gold);">${playerName(mvp.blue)}</div></div>`:''}
+      </div>
+    </div>`;
+  } else el('summary-mvp').innerHTML='';
+
+  el('summary-attendees').innerHTML=`<div class="section-label">👥 Prisutni (${(match.attendees||[]).length})</div><div style="font-size:13px;color:var(--dim);line-height:1.8;">${(match.attendees||[]).map(id=>playerName(id)).join(', ')}</div>`;
+}
+
+async function shareResult(){
+  const match=S.match;
+  const img=await generateShareImage(match);
+  try{
+    const blob=await new Promise(r=>img.toBlob(r,'image/png'));
+    const file=new File([blob],'termin-rezultat.png',{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:'Termin rezultat'});
+    } else {
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='termin-rezultat.png';
+      a.click();
+    }
+  }catch(e){console.log(e);}
+}
+
+function generateShareImage(match){
+  const {score,goals,mvp,date,teams}=match;
+  const W=440, PAD=28;
+  const wSc=(teams.white||[]).filter(id=>(goals[id]||0)>0);
+  const bSc=(teams.blue||[]).filter(id=>(goals[id]||0)>0);
+  const hasMVP=mvp&&(mvp.white||mvp.blue);
+  const scorerRows=wSc.length+bSc.length;
+  const H=300+(scorerRows*30)+(hasMVP?80:0)+80;
+
+  const c=el('share-canvas');
+  c.width=W; c.height=H;
+  const ctx=c.getContext('2d');
+
+  // background card
+  ctx.fillStyle='#111826';
+  roundRect(ctx,0,0,W,H,20); ctx.fill();
+
+  // green accent bar top
+  ctx.fillStyle='#10B981';
+  roundRect(ctx,0,0,W,8,4); ctx.fill();
+
+  const div=(yy)=>{ctx.strokeStyle='#1C2940';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(PAD,yy);ctx.lineTo(W-PAD,yy);ctx.stroke();};
+
+  let y=38;
+
+  // App title
+  ctx.fillStyle='#10B981';
+  ctx.font='bold 15px system-ui';
+  ctx.textAlign='center';
+  ctx.fillText('⚽  TERMIN Fudbaleri  ·  Đukin stan', W/2, y);
+  y+=22;
+
+  ctx.fillStyle='#64748B';
+  ctx.font='13px system-ui';
+  ctx.fillText(fmtDateFull(date), W/2, y);
+  y+=22; div(y); y+=26;
+
+  // Team labels – left and right
+  const whiteWon=score.white>score.blue, blueWon=score.blue>score.white;
+  ctx.font='bold 13px system-ui';
+  ctx.fillStyle='#E2E8F0';
+  ctx.textAlign='left';
+  ctx.fillText('⬜  BIJELI', PAD, y);
+  ctx.fillStyle='#93C5FD';
+  ctx.textAlign='right';
+  ctx.fillText('PLAVI  🟦', W-PAD, y);
+  y+=46;
+
+  // Big score numbers – well spaced
+  ctx.font='bold 88px system-ui';
+  ctx.textAlign='center';
+  ctx.fillStyle=whiteWon?'#FFFFFF':'#475569';
+  ctx.fillText(String(score.white), W/2-88, y);
+
+  ctx.fillStyle='#334155';
+  ctx.font='bold 44px system-ui';
+  ctx.fillText('–', W/2, y-8);
+
+  ctx.fillStyle=blueWon?'#FFFFFF':'#475569';
+  ctx.font='bold 88px system-ui';
+  ctx.fillText(String(score.blue), W/2+88, y);
+  y+=22;
+
+  // Result
+  const resultTxt=whiteWon?'Bijeli pobjedili !':blueWon?'Plavi pobjedili !':'Remi !';
+  ctx.font='bold 17px system-ui';
+  ctx.fillStyle=whiteWon?'#F1F5F9':blueWon?'#93C5FD':'#F59E0B';
+  ctx.textAlign='center';
+  ctx.fillText(resultTxt, W/2, y);
+  y+=24; div(y); y+=22;
+
+  // Scorers
+  if(scorerRows>0){
+    ctx.font='bold 11px system-ui';
+    ctx.fillStyle='#64748B';
+    ctx.textAlign='left';
+    ctx.fillText('⚽  STRIJELCI', PAD, y);
+    y+=20;
+    ctx.font='600 15px system-ui';
+    wSc.forEach(id=>{
+      ctx.fillStyle='#E2E8F0';
+      ctx.fillText('  '+playerName(id)+(goals[id]>1?'   ('+goals[id]+'x)':''), PAD, y);
+      y+=28;
+    });
+    bSc.forEach(id=>{
+      ctx.fillStyle='#93C5FD';
+      ctx.fillText('  '+playerName(id)+(goals[id]>1?'   ('+goals[id]+'x)':''), PAD, y);
+      y+=28;
+    });
+    y+=4;
+  }
+
+  // Best player
+  if(hasMVP){
+    div(y); y+=20;
+    ctx.font='bold 11px system-ui';
+    ctx.fillStyle='#64748B';
+    ctx.textAlign='left';
+    ctx.fillText('🏆  NAJBOLJI IGRAČ', PAD, y);
+    y+=20;
+    ctx.font='bold 15px system-ui';
+    if(mvp.white){
+      ctx.fillStyle='#F59E0B';
+      ctx.fillText('⬜  Bijeli:  '+playerName(mvp.white), PAD, y);
+      y+=26;
+    }
+    if(mvp.blue){
+      ctx.fillStyle='#F59E0B';
+      ctx.fillText('🟦  Plavi:  '+playerName(mvp.blue), PAD, y);
+      y+=26;
+    }
+    y+=4;
+  }
+
+  // Attendees
+  div(y); y+=18;
+  ctx.font='11px system-ui';
+  ctx.fillStyle='#475569';
+  ctx.textAlign='center';
+  const attNames=(match.attendees||[]).map(id=>playerName(id)).join('  ·  ');
+  // wrap if too long
+  wrapText(ctx, '👥  '+attNames, W/2, y, W-PAD*2, 16);
+
+  return c;
+}
+
+function wrapText(ctx,text,x,y,maxW,lineH){
+  const words=text.split(' ');
+  let line='';
+  for(let i=0;i<words.length;i++){
+    const test=line+words[i]+' ';
+    if(ctx.measureText(test).width>maxW&&i>0){
+      ctx.fillText(line.trim(),x,y); line=words[i]+' '; y+=lineH;
+    } else { line=test; }
+  }
+  ctx.fillText(line.trim(),x,y);
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+}
+
+// ============ HISTORY ============
+function renderHistory(){
+  const matches=DB.getMatches().filter(m=>m.completed);
+  el('history-count').textContent=`${matches.length} utakmica`;
+  if(!matches.length){
+    el('history-list').innerHTML=`<div class="empty-state"><div class="ico">📋</div><h3>Nema utakmica</h3><p>Odigraj prvi termin!</p></div>`;
+    return;
+  }
+  el('history-list').innerHTML=matches.map(m=>{
+    const {white,blue}=m.score;
+    const ww=white>blue,bw=blue>white;
+    const rc=ww?'var(--wt)':bw?'var(--bt-light)':'var(--warning)';
+    const rl=ww?'Bijeli pobjedili':bw?'Plavi pobjedili':'Remi';
+    const expanded=S.expandedMatch===m.id;
+    const wSc=(m.teams?.white||[]).filter(id=>(m.goals?.[id]||0)>0);
+    const bSc=(m.teams?.blue||[]).filter(id=>(m.goals?.[id]||0)>0);
+    return `<div class="history-card${expanded?' expanded':''}" onclick="toggleExpand('${m.id}')">
+      <div class="history-row">
+        <div class="history-date"><div class="day">${fmtDay(m.date)}</div><div class="full">${fmtDate(m.date)}</div></div>
+        <div class="history-score-block"><span style="font-size:11px;color:var(--wt);font-weight:900;">B</span> ${white} – ${blue} <span style="font-size:11px;color:var(--bt-light);font-weight:900;">P</span></div>
+        <div class="history-result"><div class="result-dot" style="background:${rc};"></div><div class="result-label" style="color:${rc};">${rl}</div></div>
+        <div class="history-chevron">${expanded?'▲':'▼'}</div>
+      </div>
+      ${expanded?`<div class="expand-content">
+        ${wSc.length||bSc.length?`<div class="expand-row"><div class="expand-label">⚽ Strijelci</div>
+          <div style="display:flex;gap:12px;">
+            <div style="flex:1;">${wSc.map(id=>`<div style="font-size:13px;color:var(--wt);">${playerName(id)}${m.goals[id]>1?` (${m.goals[id]})`:''}</div>`).join('')}</div>
+            <div style="width:1px;background:var(--border);"></div>
+            <div style="flex:1;">${bSc.map(id=>`<div style="font-size:13px;color:var(--bt-light);">${playerName(id)}${m.goals[id]>1?` (${m.goals[id]})`:''}</div>`).join('')}</div>
+          </div></div>`:''}
+        ${m.mvp?.white||m.mvp?.blue?`<div class="expand-row"><div class="expand-label">🏆 Najbolji igrač</div><div style="display:flex;gap:12px;">
+          ${m.mvp.white?`<div style="font-size:13px;color:var(--gold);font-weight:700;">⬜ ${playerName(m.mvp.white)}</div>`:''}
+          ${m.mvp.blue?`<div style="font-size:13px;color:var(--gold);font-weight:700;">🟦 ${playerName(m.mvp.blue)}</div>`:''}
+        </div></div>`:''}
+        <div class="expand-row"><div class="expand-label">👥 Prisutni (${(m.attendees||[]).length})</div><div style="font-size:12px;color:var(--dim);">${(m.attendees||[]).map(id=>playerName(id)).join(', ')}</div></div>
+        <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:6px;">
+          <button onclick="event.stopPropagation();delMatch('${m.id}')" style="color:var(--danger);font-size:13px;background:none;border:none;cursor:pointer;font-family:inherit;">🗑 Obriši utakmicu</button>
+        </div>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function toggleExpand(id){S.expandedMatch=S.expandedMatch===id?null:id;renderHistory();}
+function delMatch(id){if(confirm('Obriši utakmicu?')){DB.deleteMatch(id);S.expandedMatch=null;renderHistory();}}
+
+// ============ STATS ============
+let currentStatsTab=0;
+function statsTab(i,btn){
+  currentStatsTab=i;
+  document.querySelectorAll('.tab-btn').forEach((b,j)=>b.classList.toggle('active',j===i));
+  renderStats(i);
+}
+
+function renderStats(tab=0){
+  const matches=DB.getMatches().filter(m=>m.completed);
+  const players=DB.getPlayers();
+  el('stats-count').textContent=`${matches.length} termina`;
+
+  const pmap={};
+  players.forEach(p=>{pmap[p.id]={...p,totalGoals:0,totalMatches:0,mvpCount:0,hatTricks:0,maxGoalsInMatch:0,maxStreak:0,currentStreak:0,currentGoalStreak:0};});
+
+  let biggestWin=null,biggestWinTeam=null,biggestWinDiff=0;
+  let mostGoals={count:0,name:'',date:''};
+
+  const sorted=[...matches].sort((a,b)=>new Date(a.date)-new Date(b.date));
+
+  sorted.forEach(m=>{
+    (m.attendees||[]).forEach(id=>{if(pmap[id])pmap[id].totalMatches++;});
+    Object.entries(m.goals||{}).forEach(([id,g])=>{
+      if(!pmap[id])return;
+      pmap[id].totalGoals+=g;
+      if(g>pmap[id].maxGoalsInMatch)pmap[id].maxGoalsInMatch=g;
+      if(g>=3)pmap[id].hatTricks++;
+      if(g>mostGoals.count)mostGoals={count:g,name:pmap[id].name,date:fmtDate(m.date)};
+    });
+    if(m.mvp?.white&&pmap[m.mvp.white])pmap[m.mvp.white].mvpCount++;
+    if(m.mvp?.blue&&pmap[m.mvp.blue])pmap[m.mvp.blue].mvpCount++;
+    const diff=Math.abs(m.score.white-m.score.blue);
+    if(diff>biggestWinDiff){biggestWinDiff=diff;biggestWin=m;biggestWinTeam=m.score.white>m.score.blue?'white':'blue';}
+  });
+
+  // streaks
+  players.forEach(p=>{
+    let cur=0,max=0;
+    sorted.forEach(m=>{if((m.attendees||[]).includes(p.id)){cur++;if(cur>max)max=cur;}else cur=0;});
+    if(pmap[p.id]){pmap[p.id].maxStreak=max;
+      let cc=0;for(let i=sorted.length-1;i>=0;i--){if((sorted[i].attendees||[]).includes(p.id))cc++;else break;}
+      pmap[p.id].currentStreak=cc;
+      let cg=0;for(let i=sorted.length-1;i>=0;i--){const att=(sorted[i].attendees||[]).includes(p.id);if(!att)break;if((sorted[i].goals?.[p.id]||0)>0)cg++;else cg=0;}
+      pmap[p.id].currentGoalStreak=cg;
+    }
+  });
+
+  const pstats=Object.values(pmap).filter(p=>p.totalMatches>0||p.totalGoals>0);
+  const byGoals=[...pstats].sort((a,b)=>b.totalGoals-a.totalGoals);
+  const byMatches=[...pstats].sort((a,b)=>b.totalMatches-a.totalMatches);
+  const byMVP=[...pstats].filter(p=>p.mvpCount>0).sort((a,b)=>b.mvpCount-a.mvpCount);
+
+  if(tab===0){
+    if(!byGoals.length){el('stats-content').innerHTML=`<div class="empty-state"><div class="ico">📊</div><p>Odigraj prvi termin!</p></div>`;return;}
+    el('stats-content').innerHTML=byGoals.map((p,i)=>`
+      <div class="stat-row${i===0?' top':''}">
+        <div style="width:28px;text-align:center;">${i===0?'👑':`<span style="font-size:15px;font-weight:900;color:var(--muted);">${i+1}</span>`}</div>
+        <div style="width:8px;height:8px;border-radius:50%;background:${p.defaultTeam==='white'?'var(--wt)':'var(--bt)'};flex-shrink:0;"></div>
+        <div style="flex:1;font-size:15px;font-weight:700;">${p.name}</div>
+        <div style="display:flex;gap:6px;">
+          <div class="stat-chip${i===0?' hl':''}"><div class="val">${p.totalGoals}</div><div class="lbl">gol</div></div>
+          <div class="stat-chip"><div class="val">${p.totalMatches}</div><div class="lbl">term</div></div>
+          <div class="stat-chip${p.mvpCount>0?' gold':''}"><div class="val">${p.mvpCount}</div><div class="lbl">MVP</div></div>
+        </div>
+      </div>`).join('');
+  } else if(tab===1){
+    if(!matches.length){el('stats-content').innerHTML=`<div class="empty-state"><div class="ico">🏆</div><p>Odigraj prvi termin!</p></div>`;return;}
+    const hatKings=pstats.filter(p=>p.hatTricks>0).sort((a,b)=>b.hatTricks-a.hatTricks).slice(0,3).map(p=>`${p.name} (${p.hatTricks}x)`).join(', ')||'Nitko još';
+    el('stats-content').innerHTML=`
+      ${recCard('🥇','#F59E0B',byGoals[0]?`${byGoals[0].name} – ${byGoals[0].totalGoals} golova`:'–','Kralj strijelaca')}
+      ${recCard('⭐','#F59E0B',byMVP[0]?`${byMVP[0].name} – ${byMVP[0].mvpCount}x MVP`:'Nitko nije dobio MVP','Najviše MVP-a')}
+      ${recCard('💥','#FF6B35',mostGoals.count>0?`${mostGoals.name} – ${mostGoals.count} gola (${mostGoals.date})`:'–','Najviše golova u jednoj utakmici')}
+      ${recCard('📅','#10B981',byMatches[0]?`${byMatches[0].name} – ${byMatches[0].totalMatches} termina`:'–','Najvjerniji igrač')}
+      ${recCard('🎩','#8B5CF6',hatKings,'Hat-trick kraljevi (3+ golova)')}
+      ${biggestWin?recCard('🚀','#F59E0B',`${biggestWinTeam==='white'?'Bijeli':'Plavi'} – ${biggestWin.score.white}:${biggestWin.score.blue} (${fmtDate(biggestWin.date)})`,'Najveća pobjeda'):''}
+    `;
+  } else {
+    if(!matches.length){el('stats-content').innerHTML=`<div class="empty-state"><div class="ico">🔥</div><p>Odigraj prvi termin!</p></div>`;return;}
+    const activeStr=pstats.filter(p=>p.currentStreak>0).sort((a,b)=>b.currentStreak-a.currentStreak);
+    const maxStr=pstats.filter(p=>p.maxStreak>1).sort((a,b)=>b.maxStreak-a.maxStreak);
+    const goalStr=pstats.filter(p=>p.currentGoalStreak>0).sort((a,b)=>b.currentGoalStreak-a.currentGoalStreak);
+    el('stats-content').innerHTML=`
+      <div class="section-label">🔥 Aktivne serije dolazaka</div>
+      ${activeStr.map(p=>`<div class="streak-row active"><div style="width:8px;height:8px;border-radius:50%;background:${p.defaultTeam==='white'?'var(--wt)':'var(--bt)'};"></div><span style="flex:1;font-size:14px;font-weight:700;">${p.name}</span><span style="font-size:16px;font-weight:900;color:#FF6B35;">🔥 ${p.currentStreak}</span><span style="font-size:10px;color:var(--muted);margin-left:4px;">term.</span></div>`).join('')||'<div style="font-size:13px;color:var(--muted);padding:8px 0;">Nema aktivnih serija.</div>'}
+      <div class="section-label" style="margin-top:16px;">📊 Rekord dolazaka</div>
+      ${maxStr.map(p=>`<div class="streak-row"><div style="width:8px;height:8px;border-radius:50%;background:${p.defaultTeam==='white'?'var(--wt)':'var(--bt)'};"></div><span style="flex:1;font-size:14px;font-weight:700;">${p.name}</span><span style="font-size:16px;font-weight:900;color:var(--dim);">${p.maxStreak}</span><span style="font-size:10px;color:var(--muted);margin-left:4px;">uzast.</span></div>`).join('')||'<div style="font-size:13px;color:var(--muted);padding:8px 0;">Nema podataka.</div>'}
+      <div class="section-label" style="margin-top:16px;">⚽ Serija golova (aktivna)</div>
+      ${goalStr.map(p=>`<div class="streak-row active"><div style="width:8px;height:8px;border-radius:50%;background:${p.defaultTeam==='white'?'var(--wt)':'var(--bt)'};"></div><span style="flex:1;font-size:14px;font-weight:700;">${p.name}</span><span style="font-size:16px;font-weight:900;color:var(--accent);">⚽ ${p.currentGoalStreak}</span><span style="font-size:10px;color:var(--muted);margin-left:4px;">utakmica</span></div>`).join('')||'<div style="font-size:13px;color:var(--muted);padding:8px 0;">Nema aktivnih serija golova.</div>'}
+    `;
+  }
+}
+
+function recCard(ico,color,val,title){
+  return `<div class="record-card"><div class="record-icon" style="background:${color}22;color:${color};">${ico}</div><div><div class="record-title">${title}</div><div class="record-val">${val}</div></div></div>`;
+}
+
+// ============ PLAYERS ============
+function renderPlayers(){
+  const players=DB.getPlayers();
+  el('players-count').textContent=`${players.filter(p=>p.defaultTeam==='white').length} bij · ${players.filter(p=>p.defaultTeam==='blue').length} pla · ukupno ${players.length}`;
+  if(!players.length){
+    el('players-list').innerHTML=`<div class="empty-state"><div class="ico">👥</div><h3>Nema igrača u rosteru</h3><p>Dodaj sve igrače koji dolaze na termin.</p></div>`;
+    return;
+  }
+  el('players-list').innerHTML=players.map(p=>`
+    <div class="player-list-row">
+      <div class="team-tag ${p.defaultTeam==='white'?'wt':'bt'}">${p.defaultTeam==='white'?'B':'P'}</div>
+      <span style="flex:1;font-size:16px;font-weight:700;">${p.name}</span>
+      <button onclick="editPlayer('${p.id}')" style="color:var(--dim);font-size:18px;padding:4px 8px;background:none;border:none;cursor:pointer;">✏️</button>
+      <button onclick="deletePlayer('${p.id}')" style="color:var(--danger);font-size:18px;padding:4px 8px;background:none;border:none;cursor:pointer;">🗑</button>
+    </div>`).join('');
+}
+
+function openPlayerModal(player=null){
+  S.editingPlayerId=player?.id||null;
+  S.selectedTeam=player?.defaultTeam||'white';
+  el('modal-title').textContent=player?'Uredi igrača':'Dodaj igrača';
+  el('player-name-input').value=player?.name||'';
+  selectTeam(S.selectedTeam);
+  el('player-modal').classList.add('open');
+  setTimeout(()=>el('player-name-input').focus(),100);
+}
+
+function closePlayerModal(){el('player-modal').classList.remove('open');}
+
+function selectTeam(team){
+  S.selectedTeam=team;
+  el('team-btn-white').classList.toggle('active',team==='white');
+  el('team-btn-blue').classList.toggle('active',team==='blue');
+}
+
+function savePlayer(){
+  const name=el('player-name-input').value.trim();
+  if(!name){alert('Upiši ime igrača.');return;}
+  const players=DB.getPlayers();
+  if(S.editingPlayerId){
+    const idx=players.findIndex(p=>p.id===S.editingPlayerId);
+    if(idx>=0)players[idx]={...players[idx],name,defaultTeam:S.selectedTeam};
+  } else {
+    players.push({id:DB.genId(),name,defaultTeam:S.selectedTeam});
+  }
+  DB.savePlayers(players);
+  closePlayerModal();
+  renderPlayers();
+}
+
+function editPlayer(id){
+  const p=DB.getPlayers().find(x=>x.id===id);
+  if(p)openPlayerModal(p);
+}
+
+function deletePlayer(id){
+  const p=DB.getPlayers().find(x=>x.id===id);
+  if(!p||!confirm(`Obriši ${p.name}?`))return;
+  DB.savePlayers(DB.getPlayers().filter(x=>x.id!==id));
+  renderPlayers();
+}
+
+// ============ CONFETTI ============
+function spawnConfetti(){
+  const canvas=el('confetti-canvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+  canvas.style.display='block';
+
+  const flash=el('goal-flash');
+  flash.classList.add('show');
+  setTimeout(()=>flash.classList.remove('show'),900);
+
+  const COLORS=['#FF4081','#FFEA00','#00E676','#40C4FF','#FF6D00','#E040FB','#69F0AE','#FF5252'];
+  const particles=Array.from({length:150},()=>({
+    x:Math.random()*canvas.width,
+    y:-20-Math.random()*80,
+    vx:(Math.random()-0.5)*5,
+    vy:Math.random()*3+0.5,
+    r:Math.random()*8+3,
+    color:COLORS[Math.floor(Math.random()*COLORS.length)],
+    rot:Math.random()*360,
+    rspd:(Math.random()-0.5)*5,
+    isRect:Math.random()>.5,
+  }));
+
+  let frame=0;
+  const maxFrames=380;
+
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.vy+=0.04;p.rot+=p.rspd;
+      const alpha=Math.max(0,frame<260?1:1-((frame-260)/120));
+      ctx.globalAlpha=alpha;
+      ctx.fillStyle=p.color;
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.rot*Math.PI/180);
+      if(p.isRect)ctx.fillRect(-p.r*0.6,-p.r,p.r*1.2,p.r*2);
+      else{ctx.beginPath();ctx.arc(0,0,p.r,0,Math.PI*2);ctx.fill();}
+      ctx.restore();
+    });
+    ctx.globalAlpha=1;
+    frame++;
+    if(frame<maxFrames)requestAnimationFrame(draw);
+    else{canvas.style.display='none';ctx.clearRect(0,0,canvas.width,canvas.height);}
+  }
+  requestAnimationFrame(draw);
+}
+
+// keyboard for modal
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&el('player-modal').classList.contains('open'))savePlayer();if(e.key==='Escape')closePlayerModal();});
+el('player-modal').addEventListener('click',e=>{if(e.target===el('player-modal'))closePlayerModal();});
+
+// ============ INIT ============
+navTo('home');
+</script>
+</body>
+</html>
