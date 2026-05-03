@@ -924,9 +924,12 @@ function generateShareImage(match){
   const scorerRows=wSc.length+bSc.length;
   const H=300+(scorerRows*30)+(hasMVP?80:0)+80;
 
+  const DPR=Math.min(window.devicePixelRatio||2,3);
   const c=el('share-canvas');
-  c.width=W; c.height=H;
+  c.width=W*DPR; c.height=H*DPR;
+  c.style.width=W+'px'; c.style.height=H+'px';
   const ctx=c.getContext('2d');
+  ctx.scale(DPR,DPR);
 
   // background card
   ctx.fillStyle='#111826';
