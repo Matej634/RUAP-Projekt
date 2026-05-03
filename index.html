@@ -312,10 +312,12 @@ input.text-input:focus{outline:none;border-color:var(--accent);}
 </div>
 
 <!-- ===== PLAYERS ===== -->
-<div id="screen-players" class="screen">
+<div id="screen-players" class="screen" style="padding-bottom:136px;">
   <div class="hdr"><h1>Roster</h1><span id="players-count" style="color:var(--muted);font-size:13px;"></span></div>
   <div id="players-list" style="padding:12px 16px;"></div>
-  <button class="fab" onclick="openPlayerModal()">+</button>
+  <div style="position:fixed;bottom:60px;left:50%;transform:translateX(-50%);width:100%;max-width:480px;padding:12px 16px;background:var(--bg);border-top:1px solid var(--border);z-index:50;">
+    <button class="btn btn-accent" onclick="openPlayerModal()" style="font-size:17px;letter-spacing:1px;gap:10px;">➕ Dodaj igrača</button>
+  </div>
 </div>
 
 <!-- ===== ATTENDANCE ===== -->
@@ -704,10 +706,10 @@ function attachGoalEvents(){
       pressTimer=setTimeout(()=>{undoGoal(card.dataset.player,card.dataset.team);pressTimer=null;},500);
     });
     card.addEventListener('touchend',e=>{
+      e.preventDefault();
       if(pressTimer){clearTimeout(pressTimer);addGoal(card.dataset.player,card.dataset.team);}
     });
     card.addEventListener('touchmove',()=>{if(pressTimer){clearTimeout(pressTimer);pressTimer=null;}});
-    // desktop click
     card.addEventListener('click',e=>{addGoal(card.dataset.player,card.dataset.team);});
   });
 }
