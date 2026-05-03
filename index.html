@@ -278,6 +278,17 @@ input.text-input:focus{outline:none;border-color:var(--accent);}
     <button class="btn btn-accent mb24" onclick="navigate('attendance')" style="gap:10px;font-size:18px;letter-spacing:2px;margin-bottom:20px;">➕ NOVI TERMIN</button>
     <div class="section-label">Zadnji termin</div>
     <div id="home-last-match"></div>
+    <div style="margin-top:20px;padding-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div class="section-label" style="margin-bottom:0;">Podaci</div>
+        <div id="persist-badge" style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;"></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-outline" style="flex:1;padding:14px;font-size:14px;gap:6px;" onclick="exportData()">📤 Spremi backup</button>
+        <button class="btn btn-outline" style="flex:1;padding:14px;font-size:14px;gap:6px;" onclick="el('import-input').click()">📥 Učitaj backup</button>
+      </div>
+      <input type="file" id="import-input" accept=".json" style="display:none;" onchange="importData(event)">
+    </div>
   </div>
 </div>
 
@@ -1328,8 +1339,63 @@ function spawnConfetti(){
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&el('player-modal').classList.contains('open'))savePlayer();if(e.key==='Escape')closePlayerModal();});
 el('player-modal').addEventListener('click',e=>{if(e.target===el('player-modal'))closePlayerModal();});
 
+// ============ EXPORT / IMPORT ============
+function exportData(){
+  const data={players:DB.getPlayers(),matches:DB.getMatches(),exported:new Date().toISOString()};
+  const json=JSON.stringify(data,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  const d=new Date();
+  a.download=`termin-backup-${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function importData(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!data.players||!data.matches)throw new Error();
+      if(!confirm(`Učitati backup?\n\n${data.players.length} igrača · ${data.matches.length} utakmica\n\nTrenutni podaci bit će zamijenjeni.`)){e.target.value='';return;}
+      DB.savePlayers(data.players);
+      localStorage.setItem('termin_matches',JSON.stringify(data.matches));
+      e.target.value='';
+      navTo('home');
+      alert('Backup uspješno učitan!');
+    }catch{
+      alert('Nevažeći backup file.');
+      e.target.value='';
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ============ PERSISTENT STORAGE ============
+async function requestPersistentStorage(){
+  const badge=el('persist-badge');
+  if(!navigator.storage?.persist){
+    if(badge)badge.style.display='none';
+    return;
+  }
+  const already=await navigator.storage.persisted();
+  if(already){
+    if(badge){badge.textContent='🔒 Podaci zaštićeni';badge.style.background='color-mix(in srgb,var(--accent) 15%,transparent)';badge.style.color='var(--accent)';}
+    return;
+  }
+  const granted=await navigator.storage.persist();
+  if(badge){
+    if(granted){badge.textContent='🔒 Podaci zaštićeni';badge.style.background='color-mix(in srgb,var(--accent) 15%,transparent)';badge.style.color='var(--accent)';}
+    else{badge.textContent='⚠️ Nije zaštićeno';badge.style.background='color-mix(in srgb,var(--warning) 15%,transparent)';badge.style.color='var(--warning)';}
+  }
+}
+
 // ============ INIT ============
 navTo('home');
+requestPersistentStorage();
 </script>
 </body>
 </html>
