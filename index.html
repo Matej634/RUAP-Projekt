@@ -8,17 +8,17 @@
 <title>Termin ⚽</title>
 <style>
 :root {
-  --bg:#080D18; --bg2:#0C1220; --card:#111826; --border:#1C2940;
-  --text:#E2E8F0; --muted:#64748B; --dim:#94A3B8;
-  --accent:#10B981; --accent-dark:#059669; --accent-light:#34D399;
-  --danger:#EF4444; --warning:#F59E0B;
-  --wt:#F1F5F9; --wt-bg:#1E293B; --wt-border:#475569;
-  --bt:#3B82F6; --bt-bg:#1E3A8A; --bt-border:#2563EB; --bt-light:#93C5FD;
-  --gold:#F59E0B; --gold-bg:#2D1F00;
+  --bg:#080808; --bg2:#111111; --card:#161616; --border:#252525;
+  --text:#F0F0F0; --muted:#555555; --dim:#8A8A8A;
+  --accent:#D4AF37; --accent-dark:#B8960C; --accent-light:#F0CC5A;
+  --danger:#DC2626; --warning:#F59E0B;
+  --wt:#F0F0F0; --wt-bg:#1C1C1C; --wt-border:#3A3A3A;
+  --bt:#0EA5E9; --bt-bg:#0C1A2E; --bt-border:#0369A1; --bt-light:#38BDF8;
+  --gold:#D4AF37; --gold-bg:#1A1200;
   --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:24px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{background:#061208;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:480px;margin:0 auto;min-height:100dvh;overflow-x:hidden;}
+body{background:#080808;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:480px;margin:0 auto;min-height:100dvh;overflow-x:hidden;}
 .screen{display:none;min-height:100dvh;padding-bottom:68px;}
 .screen.active{display:block;}
 .screen.flow{padding-bottom:0;display:flex;flex-direction:column;}
@@ -26,7 +26,7 @@ body{background:#061208;color:var(--text);font-family:-apple-system,BlinkMacSyst
 button{cursor:pointer;border:none;background:none;color:inherit;font-family:inherit;}
 
 /* BOTTOM NAV */
-#bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--card);border-top:1px solid var(--border);display:flex;z-index:100;height:60px;}
+#bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#0E0E0E;border-top:1px solid #252525;display:flex;z-index:100;height:60px;}
 #bottom-nav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.5px;transition:color .15s;}
 #bottom-nav button.active{color:var(--accent);}
 #bottom-nav button span.ico{font-size:20px;}
@@ -44,19 +44,19 @@ button{cursor:pointer;border:none;background:none;color:inherit;font-family:inhe
 /* BUTTONS */
 .btn{display:flex;align-items:center;justify-content:center;border-radius:var(--r-xl);font-weight:800;cursor:pointer;transition:opacity .15s;border:none;font-family:inherit;}
 .btn:active{opacity:.75;}
-.btn-accent{background:var(--accent);color:#fff;padding:18px 24px;font-size:16px;width:100%;box-shadow:0 4px 20px #10B98144;}
-.btn-danger{background:var(--danger);color:#fff;padding:16px 24px;font-size:16px;width:100%;box-shadow:0 4px 16px #EF444440;}
+.btn-accent{background:linear-gradient(135deg,#D4AF37,#F0CC5A);color:#080808;padding:18px 24px;font-size:16px;width:100%;box-shadow:0 4px 24px #D4AF3740;}
+.btn-danger{background:var(--danger);color:#fff;padding:16px 24px;font-size:16px;width:100%;box-shadow:0 4px 16px #DC262640;}
 .btn-outline{background:none;color:var(--dim);padding:14px 20px;font-size:14px;border:1px solid var(--border);border-radius:var(--r-lg);}
 .btn-sm{padding:10px 16px;font-size:13px;border-radius:var(--r-md);}
 
 /* GRID */
 .player-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px;}
 .player-attendance-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:all .15s;position:relative;min-height:90px;justify-content:center;}
-.player-attendance-card.present{background:#059669,22;border-color:var(--accent);background:color-mix(in srgb,var(--accent) 15%,var(--card));}
+.player-attendance-card.present{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--card));}
 .player-attendance-card .team-dot{width:10px;height:10px;border-radius:50%;}
 .player-attendance-card .pname{font-size:16px;font-weight:700;text-align:center;color:var(--dim);}
 .player-attendance-card.present .pname{color:#fff;}
-.player-attendance-card .check{position:absolute;top:8px;right:8px;background:var(--accent);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;}
+.player-attendance-card .check{position:absolute;top:8px;right:8px;background:var(--accent);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;color:#080808;}
 
 /* MATCH CARDS */
 .goal-card{background:var(--wt-bg);border:1.5px solid var(--wt-border);border-radius:var(--r-lg);padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:transform .1s;user-select:none;min-height:110px;justify-content:center;}
@@ -68,18 +68,32 @@ button{cursor:pointer;border:none;background:none;color:inherit;font-family:inhe
 .goal-card .gballs{font-size:14px;}
 .goal-card .gtap{font-size:10px;color:var(--muted);}
 
-/* SCORE BOARD */
-.scoreboard{background:var(--card);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;}
-.score-team{display:flex;flex-direction:column;align-items:center;gap:4px;}
-.score-team-label{font-size:11px;font-weight:900;letter-spacing:2px;}
-.score-controls{display:flex;align-items:center;gap:10px;}
-.score-btn{width:34px;height:34px;border-radius:50%;font-size:20px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;line-height:1;}
-.score-btn.wt{background:var(--wt-bg);}
-.score-btn.bt{background:var(--bt-bg);}
-.score-val{font-size:44px;font-weight:900;color:#fff;min-width:48px;text-align:center;}
-.score-sep{display:flex;flex-direction:column;align-items:center;}
-.score-dash{font-size:28px;color:var(--muted);font-weight:300;}
-.live-dot{font-size:9px;color:var(--danger);font-weight:700;letter-spacing:1.5px;}
+/* SCORE BOARD - FIFA WC 2026 */
+.scoreboard{background:#050505;border-bottom:1px solid #1A1A1A;display:flex;flex-direction:column;}
+.sb-bar{display:flex;align-items:stretch;height:76px;}
+.sb-team-side{flex:1;display:flex;align-items:center;gap:10px;padding:0 12px;}
+.sb-team-side.sb-white{background:linear-gradient(90deg,#1E1E1E,#0A0A0A);}
+.sb-team-side.sb-blue{background:linear-gradient(90deg,#0A0A0A,#0C1A2E);flex-direction:row-reverse;}
+.sb-stripe{width:4px;align-self:stretch;border-radius:2px;flex-shrink:0;}
+.sb-stripe-w{background:linear-gradient(180deg,#E0E0E0,#555);}
+.sb-stripe-b{background:linear-gradient(180deg,#38BDF8,#0369A1);}
+.sb-team-info{flex:1;}
+.sb-team-info.right{text-align:right;}
+.sb-label{font-size:10px;font-weight:900;letter-spacing:3px;margin-bottom:2px;}
+.sb-label-w{color:#888;}
+.sb-label-b{color:#0EA5E9;}
+.sb-score-val{font-size:48px;font-weight:900;color:#fff;line-height:1;}
+.sb-center{width:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex-shrink:0;background:#080808;border-left:1px solid #1A1A1A;border-right:1px solid #1A1A1A;}
+.sb-center-badge{background:#161616;border:1px solid #2A2A2A;border-radius:8px;width:40px;height:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;}
+.sb-center-icon{font-size:18px;line-height:1;}
+.sb-live{font-size:6px;font-weight:900;letter-spacing:2px;color:var(--gold);}
+.sb-adj{display:flex;border-top:1px solid #1A1A1A;background:#080808;}
+.sb-adj-side{flex:1;display:flex;align-items:center;gap:6px;padding:6px 12px;}
+.sb-adj-side.right{justify-content:flex-end;}
+.sb-adj-btn{width:32px;height:26px;border-radius:6px;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid #2A2A2A;color:#666;background:#161616;font-family:inherit;line-height:1;}
+.sb-adj-btn.plus-w{border-color:#3A3A3A;color:#E0E0E0;}
+.sb-adj-btn.plus-b{border-color:#0369A1;color:#38BDF8;background:#0C1A2E;}
+.sb-adj-space{width:62px;flex-shrink:0;}
 
 /* TEAM SETUP */
 .teams-wrap{display:flex;gap:1px;flex:1;overflow:hidden;}
@@ -119,7 +133,7 @@ button{cursor:pointer;border:none;background:none;color:inherit;font-family:inhe
 /* STATS */
 .tab-bar{display:flex;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);}
 .tab-btn{flex:1;padding:8px;border-radius:var(--r-sm);font-size:13px;font-weight:700;color:var(--muted);background:var(--card);cursor:pointer;text-align:center;border:none;font-family:inherit;}
-.tab-btn.active{background:var(--accent);color:#fff;}
+.tab-btn.active{background:var(--accent);color:#080808;}
 .stat-row{display:flex;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 14px;margin-bottom:6px;gap:10px;}
 .stat-row.top{border-color:color-mix(in srgb,var(--gold) 50%,transparent);background:var(--gold-bg);}
 .stat-chip{background:var(--bg2);border-radius:var(--r-sm);padding:4px 8px;text-align:center;min-width:38px;}
@@ -139,10 +153,10 @@ button{cursor:pointer;border:none;background:none;color:inherit;font-family:inhe
 .team-tag{width:28px;height:28px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;border:1px solid;}
 .team-tag.wt{background:var(--wt-bg);border-color:var(--wt-border);color:var(--wt);}
 .team-tag.bt{background:var(--bt-bg);border-color:var(--bt-border);color:var(--bt-light);}
-.fab{position:fixed;bottom:76px;right:calc(50% - 228px);width:52px;height:52px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;cursor:pointer;box-shadow:0 4px 16px #10B98155;z-index:50;border:none;}
+.fab{position:fixed;bottom:76px;right:calc(50% - 228px);width:52px;height:52px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:28px;color:#080808;cursor:pointer;box-shadow:0 4px 16px #D4AF3755;z-index:50;border:none;}
 
 /* MODAL */
-.modal-overlay{position:fixed;inset:0;background:#000a;display:flex;align-items:flex-end;z-index:200;display:none;}
+.modal-overlay{position:fixed;inset:0;background:#000c;display:flex;align-items:flex-end;z-index:200;display:none;}
 .modal-overlay.open{display:flex;}
 .modal-card{background:var(--card);border-radius:var(--r-xl) var(--r-xl) 0 0;border-top:1px solid var(--border);padding:24px;width:100%;max-width:480px;margin:0 auto;}
 .modal-card h2{font-size:20px;font-weight:900;text-align:center;margin-bottom:20px;}
@@ -198,16 +212,19 @@ input.text-input:focus{outline:none;border-color:var(--accent);}
 
 <!-- FOOTBALL FIELD BACKGROUND -->
 <svg id="field-bg" viewBox="0 0 480 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-  <rect width="480" height="900" fill="#061208"/>
-  <!-- Grass stripes -->
-  <rect y="0"   width="480" height="75" fill="#081B09" opacity="0.6"/>
-  <rect y="150" width="480" height="75" fill="#081B09" opacity="0.6"/>
-  <rect y="300" width="480" height="75" fill="#081B09" opacity="0.6"/>
-  <rect y="450" width="480" height="75" fill="#081B09" opacity="0.6"/>
-  <rect y="600" width="480" height="75" fill="#081B09" opacity="0.6"/>
-  <rect y="750" width="480" height="75" fill="#081B09" opacity="0.6"/>
-  <!-- All lines at opacity 0.07 -->
-  <g stroke="white" stroke-width="2" fill="none" opacity="0.07">
+  <rect width="480" height="900" fill="#080808"/>
+  <!-- Dark pitch stripes -->
+  <rect y="0"   width="480" height="75" fill="#0D0D0D" opacity="0.8"/>
+  <rect y="150" width="480" height="75" fill="#0D0D0D" opacity="0.8"/>
+  <rect y="300" width="480" height="75" fill="#0D0D0D" opacity="0.8"/>
+  <rect y="450" width="480" height="75" fill="#0D0D0D" opacity="0.8"/>
+  <rect y="600" width="480" height="75" fill="#0D0D0D" opacity="0.8"/>
+  <rect y="750" width="480" height="75" fill="#0D0D0D" opacity="0.8"/>
+  <!-- FIFA WC gold accent lines -->
+  <line x1="0" y1="1" x2="480" y2="1" stroke="#D4AF37" stroke-width="2" opacity="0.15"/>
+  <line x1="0" y1="899" x2="480" y2="899" stroke="#D4AF37" stroke-width="2" opacity="0.15"/>
+  <!-- All lines at opacity 0.05 -->
+  <g stroke="white" stroke-width="2" fill="none" opacity="0.05">
     <!-- Outer boundary -->
     <rect x="36" y="36" width="408" height="828"/>
     <!-- Halfway line -->
@@ -266,13 +283,18 @@ input.text-input:focus{outline:none;border-color:var(--accent);}
 <!-- ===== HOME ===== -->
 <div id="screen-home" class="screen active">
   <div style="padding:16px 16px 0;">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;margin-top:8px;">
+    <!-- FIFA WC 2026 top bar -->
+    <div style="margin:-16px -16px 14px;padding:10px 16px 10px;background:linear-gradient(90deg,#0A0A0A,#161208,#0A0A0A);border-bottom:2px solid;border-image:linear-gradient(90deg,transparent,#D4AF37,transparent) 1;display:flex;align-items:center;justify-content:space-between;">
       <div>
-        <div style="font-size:24px;font-weight:900;letter-spacing:2px;">⚽ TERMIN <span style="color:var(--accent-light);font-size:18px;letter-spacing:1px;">Fudbaleri</span></div>
-        <div id="home-date" style="font-size:13px;color:var(--muted);margin-top:2px;"></div>
+        <div style="font-size:22px;font-weight:900;letter-spacing:3px;background:linear-gradient(90deg,#D4AF37,#F0CC5A,#D4AF37);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">TERMIN</div>
+        <div style="font-size:11px;font-weight:700;color:#555;letter-spacing:2px;margin-top:1px;">FUDBALERI · ĐUKIN STAN</div>
       </div>
-      <div style="border:1px solid var(--accent);border-radius:99px;padding:4px 10px;font-size:11px;color:var(--accent);font-weight:700;margin-top:6px;text-align:center;">Sezona 2026.<br>Đukin stan</div>
+      <div style="text-align:right;">
+        <div style="font-size:28px;font-weight:900;color:#fff;line-height:1;letter-spacing:-1px;">26</div>
+        <div style="font-size:9px;font-weight:900;color:#D4AF37;letter-spacing:2px;">SEZONA</div>
+      </div>
     </div>
+    <div id="home-date" style="font-size:12px;color:var(--muted);margin-bottom:12px;letter-spacing:.5px;"></div>
     <div id="home-winratio" class="mb12"></div>
     <div id="home-topscorer"></div>
     <button class="btn btn-accent mb24" onclick="navigate('attendance')" style="gap:10px;font-size:18px;letter-spacing:2px;margin-bottom:20px;">➕ NOVI TERMIN</button>
@@ -380,24 +402,41 @@ input.text-input:focus{outline:none;border-color:var(--accent);}
 <!-- ===== MATCH ===== -->
 <div id="screen-match" class="screen flow" style="display:flex;flex-direction:column;height:100dvh;overflow:hidden;">
   <div class="scoreboard" id="scoreboard">
-    <div class="score-team">
-      <div class="score-team-label" style="color:var(--wt);">BIJELI</div>
-      <div class="score-controls">
-        <button class="score-btn wt" onclick="adjScore('white',-1)">−</button>
-        <div class="score-val" id="score-white">0</div>
-        <button class="score-btn wt" onclick="adjScore('white',1)">+</button>
+    <div class="sb-bar">
+      <!-- BIJELI -->
+      <div class="sb-team-side sb-white">
+        <div class="sb-stripe sb-stripe-w"></div>
+        <div class="sb-team-info">
+          <div class="sb-label sb-label-w">BIJELI</div>
+          <div class="sb-score-val" id="score-white">0</div>
+        </div>
+      </div>
+      <!-- Center badge -->
+      <div class="sb-center">
+        <div class="sb-center-badge">
+          <div class="sb-center-icon">⚽</div>
+          <div class="sb-live">UŽIVO</div>
+        </div>
+      </div>
+      <!-- PLAVI -->
+      <div class="sb-team-side sb-blue">
+        <div class="sb-stripe sb-stripe-b"></div>
+        <div class="sb-team-info right">
+          <div class="sb-label sb-label-b">PLAVI</div>
+          <div class="sb-score-val" id="score-blue">0</div>
+        </div>
       </div>
     </div>
-    <div class="score-sep">
-      <div class="score-dash">:</div>
-      <div class="live-dot">UŽIVO</div>
-    </div>
-    <div class="score-team">
-      <div class="score-team-label" style="color:var(--bt-light);">PLAVI</div>
-      <div class="score-controls">
-        <button class="score-btn bt" onclick="adjScore('blue',-1)">−</button>
-        <div class="score-val" id="score-blue">0</div>
-        <button class="score-btn bt" onclick="adjScore('blue',1)">+</button>
+    <!-- Score adjustment buttons -->
+    <div class="sb-adj">
+      <div class="sb-adj-side">
+        <button class="sb-adj-btn" onclick="adjScore('white',-1)">−</button>
+        <button class="sb-adj-btn plus-w" onclick="adjScore('white',1)">+</button>
+      </div>
+      <div class="sb-adj-space"></div>
+      <div class="sb-adj-side right">
+        <button class="sb-adj-btn" onclick="adjScore('blue',-1)">−</button>
+        <button class="sb-adj-btn plus-b" onclick="adjScore('blue',1)">+</button>
       </div>
     </div>
   </div>
